@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CheckCircle2, CircleDashed, FileText, Send, Loader2, HandCoins } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CheckCircle2, CircleDashed, FileText, Send, Loader2, HandCoins, ShieldCheck } from "lucide-react";
 import { checkEligibility, welfareChat } from "../api";
 
 const OCCUPATIONS = [
@@ -13,10 +14,20 @@ const INDIAN_STATES = [
   "Uttar Pradesh", "West Bengal", "Other",
 ];
 
+const CATEGORIES = ["General", "OBC", "SC", "ST"];
+const MARITAL_STATUSES = ["Single", "Married", "Widowed", "Divorced"];
+const EDUCATION_LEVELS = [
+  "Not yet in school", "Below 10th", "10th passed", "12th passed", "Graduate", "Post-graduate",
+];
+
 const emptyProfile = {
   age: "", gender: "", occupation: "", annual_income: "", state: "",
   owns_land: null, owns_pucca_house: null, has_girl_child_under_10: null,
   bpl_or_seci_listed: null, has_disability: null,
+  // personal / logical / academic
+  category: "", marital_status: "", residence_type: "", family_members: "",
+  education_level: "", currently_studying: null, is_pregnant_or_lactating: null,
+  has_bank_account: null,
 };
 
 function TriToggle({ label, value, onChange }) {
@@ -119,9 +130,14 @@ export default function WelfareCopilot() {
         ...profile,
         age: profile.age ? Number(profile.age) : null,
         annual_income: profile.annual_income ? Number(profile.annual_income) : null,
+        family_members: profile.family_members ? Number(profile.family_members) : null,
         gender: profile.gender || null,
         occupation: profile.occupation || null,
         state: profile.state || null,
+        category: profile.category || null,
+        marital_status: profile.marital_status || null,
+        residence_type: profile.residence_type || null,
+        education_level: profile.education_level || null,
       };
       const res = await checkEligibility(payload);
       setResults(res.data);
@@ -160,8 +176,9 @@ export default function WelfareCopilot() {
         What government benefits am I eligible for?
       </h2>
       <p className="text-ink/70 max-w-2xl mb-8">
-        Fill in as much as you're comfortable sharing — nothing is stored beyond this session
-        except an anonymous count used for the government dashboard's scheme-adoption stats.
+        Fill in as much as you're comfortable sharing — schemes now span every age group, from
+        infant nutrition support to senior citizen pensions. Nothing is stored beyond an
+        anonymous count for the government dashboard's scheme-adoption stats.
       </p>
 
       <div className="grid lg:grid-cols-5 gap-8">
@@ -227,10 +244,74 @@ export default function WelfareCopilot() {
             </select>
           </label>
 
+          {/* Personal / logical questions */}
+          <p className="eyebrow pt-2">Personal details</p>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-sm">
+              Category
+              <select
+                value={profile.category} onChange={(e) => set("category", e.target.value)}
+                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              >
+                <option value="">Skip</option>
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label className="text-sm">
+              Marital status
+              <select
+                value={profile.marital_status} onChange={(e) => set("marital_status", e.target.value)}
+                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              >
+                <option value="">Skip</option>
+                {MARITAL_STATUSES.map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+            </label>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-sm">
+              Residence
+              <select
+                value={profile.residence_type} onChange={(e) => set("residence_type", e.target.value)}
+                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              >
+                <option value="">Skip</option>
+                <option value="urban">Urban</option>
+                <option value="rural">Rural</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              Family members
+              <input
+                type="number" min="1" value={profile.family_members}
+                onChange={(e) => set("family_members", e.target.value)}
+                placeholder="e.g. 4"
+                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              />
+            </label>
+          </div>
+
+          {/* Academic question */}
+          <label className="text-sm block">
+            Highest education level
+            <select
+              value={profile.education_level} onChange={(e) => set("education_level", e.target.value)}
+              className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+            >
+              <option value="">Skip</option>
+              {EDUCATION_LEVELS.map((e) => <option key={e} value={e}>{e}</option>)}
+            </select>
+          </label>
+
           <div>
+            <TriToggle label="Currently enrolled as a student?" value={profile.currently_studying} onChange={(v) => set("currently_studying", v)} />
             <TriToggle label="Own agricultural land?" value={profile.owns_land} onChange={(v) => set("owns_land", v)} />
             <TriToggle label="Own a pucca (permanent) house?" value={profile.owns_pucca_house} onChange={(v) => set("owns_pucca_house", v)} />
             <TriToggle label="Girl child under 10 in family?" value={profile.has_girl_child_under_10} onChange={(v) => set("has_girl_child_under_10", v)} />
+            {profile.gender === "female" && (
+              <TriToggle label="Currently pregnant or lactating?" value={profile.is_pregnant_or_lactating} onChange={(v) => set("is_pregnant_or_lactating", v)} />
+            )}
+            <TriToggle label="Have a bank account?" value={profile.has_bank_account} onChange={(v) => set("has_bank_account", v)} />
             <TriToggle label="BPL / SECC listed household?" value={profile.bpl_or_seci_listed} onChange={(v) => set("bpl_or_seci_listed", v)} />
             <TriToggle label="Certified disability (80%+)?" value={profile.has_disability} onChange={(v) => set("has_disability", v)} />
           </div>
@@ -299,6 +380,18 @@ export default function WelfareCopilot() {
                 <Send size={16} />
               </button>
             </div>
+          </div>
+
+          <div className="ledger-card rounded-md p-4 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shrink-0">
+              <ShieldCheck className="text-white" size={16} />
+            </div>
+            <p className="text-sm text-ink/80">
+              Work for a government department?{" "}
+              <Link to="/register?role=government" className="text-green-700 font-medium underline">
+                Register your official account →
+              </Link>
+            </p>
           </div>
         </div>
       </div>

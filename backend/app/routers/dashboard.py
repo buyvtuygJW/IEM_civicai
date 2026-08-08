@@ -14,6 +14,8 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 @router.get("/summary")
 def dashboard_summary(db: Session = Depends(get_db), _gov: models.User = Depends(require_role("government"))):
+    """Complaint operations only — welfare/scheme analytics live at
+    /api/welfare/admin/overview so each console page stays focused."""
     complaints = db.query(models.Complaint).all()
 
     total = len(complaints)
@@ -24,11 +26,11 @@ def dashboard_summary(db: Session = Depends(get_db), _gov: models.User = Depends
         if c.status != "resolved" and escalation.compute_escalation_level(c.created_at, c.priority, c.status) >= 1
     ]
 
-    # Hotspots: area x category counts
+    # Hotspots: area x category counts — capped at 6 to keep the chart readable
     hotspot_counter = Counter((c.area or "Unspecified", c.category) for c in complaints)
     hotspots = [
         {"area": area, "category": category, "count": count}
-        for (area, category), count in hotspot_counter.most_common(10)
+        for (area, category), count in hotspot_counter.most_common(6)
     ]
 
     # Category distribution
@@ -61,12 +63,6 @@ def dashboard_summary(db: Session = Depends(get_db), _gov: models.User = Depends
         volume_map[day] += 1
     volume_trend = [{"date": day, "count": count} for day, count in sorted(volume_map.items())][-14:]
 
-    # Scheme adoption / interest from eligibility checks
-    checks = db.query(models.EligibilityCheck).all()
-    scheme_counter = Counter(c.scheme_name for c in checks if c.matched)
-    scheme_adoption = [{"scheme": name, "interested_citizens": count}
-                        for name, count in scheme_counter.most_common(10)]
-
     # Priority breakdown
     priority_counter = Counter(c.priority for c in complaints)
     priority_breakdown = [{"priority": k, "count": v} for k, v in priority_counter.items()]
@@ -81,7 +77,5 @@ def dashboard_summary(db: Session = Depends(get_db), _gov: models.User = Depends
         "category_distribution": category_distribution,
         "resolution_trend": resolution_trend,
         "volume_trend": volume_trend,
-        "scheme_adoption": scheme_adoption,
         "priority_breakdown": priority_breakdown,
-        "total_eligibility_checks": len(checks),
     }

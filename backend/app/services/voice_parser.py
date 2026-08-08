@@ -57,9 +57,11 @@ def _extract_area(text: str) -> str:
 def parse_voice_complaint(transcript: str, language: str = "en") -> Dict:
     ai_result = ai_client.ask_json(
         system_prompt=(
-            "You convert a citizen's spoken civic complaint (English, Hindi, or Hinglish, "
-            "transcribed from speech so it may be informal or slightly garbled) into a "
-            "structured JSON object for a municipal complaint system. Respond with ONLY JSON: "
+            "You convert a citizen's spoken civic complaint into a structured JSON object for a "
+            "municipal complaint system. The transcript may be in English or any major Indian "
+            "language — Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, or "
+            "Punjabi — in native script or Latin transliteration, and since it's transcribed from "
+            "speech it may be informal or slightly garbled. Respond with ONLY JSON: "
             "{ \"description_en\": clean one-sentence English description, "
             "\"category\": one of [streetlight, water_supply, drainage, garbage, road_pothole, "
             "electricity, illegal_construction, stray_animals, noise_pollution, traffic, general], "

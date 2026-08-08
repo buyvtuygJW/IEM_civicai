@@ -130,5 +130,99 @@
     },
     "documents": ["Aadhaar Card", "Vending Certificate/ID (if available)", "Bank passbook"],
     "apply_url": "https://pmsvanidhi.mohua.gov.in"
+  },
+  {
+    "id": "pmmvy",
+    "name": "Pradhan Mantri Matru Vandana Yojana (PMMVY)",
+    "category": "Health",
+    "description": "Cash incentive for pregnant and lactating mothers to support nutrition and safe delivery.",
+    "benefit": "₹5,000 cash incentive for the first living child, in installments",
+    "criteria": {
+      "gender_in": ["female"],
+      "is_pregnant_or_lactating": true
+    },
+    "documents": ["Aadhaar Card", "Mother and Child Protection (MCP) Card", "Bank passbook"],
+    "apply_url": "https://pmmvy.wcd.gov.in"
+  },
+  {
+    "id": "icds_anganwadi",
+    "name": "Integrated Child Development Services (Anganwadi Nutrition Support)",
+    "category": "Child Welfare",
+    "description": "Supplementary nutrition, health check-ups, immunisation referrals, and pre-school education for young children at the local Anganwadi centre.",
+    "benefit": "Free daily nutrition and health monitoring for children up to age 6",
+    "criteria": {
+      "max_age": 6
+    },
+    "documents": ["Child's Birth Certificate", "Aadhaar Card (guardian)", "Address proof"],
+    "apply_url": "https://icds-wcd.nic.in"
+  },
+  {
+    "id": "pm_poshan",
+    "name": "PM POSHAN (Mid-Day Meal Scheme)",
+    "category": "Education",
+    "description": "Free nutritious mid-day meal for children studying in government and government-aided schools.",
+    "benefit": "One free nutritious meal every school day",
+    "criteria": {
+      "currently_studying": true,
+      "min_age": 6,
+      "max_age": 14
+    },
+    "documents": ["School Enrollment ID", "Aadhaar Card"],
+    "apply_url": "https://pmposhan.education.gov.in"
+  },
+  {
+    "id": "atal_pension",
+    "name": "Atal Pension Yojana (APY)",
+    "category": "Social Security",
+    "description": "Guaranteed monthly pension after age 60 for workers in the unorganised sector.",
+    "benefit": "Guaranteed monthly pension of ₹1,000–₹5,000 after age 60",
+    "criteria": {
+      "min_age": 18,
+      "max_age": 40,
+      "has_bank_account": true
+    },
+    "documents": ["Aadhaar Card", "Bank passbook", "Mobile number"],
+    "apply_url": "https://npscra.nsdl.co.in/scheme-details.php"
+  },
+  {
+    "id": "rashtriya_vayoshri",
+    "name": "Rashtriya Vayoshri Yojana",
+    "category": "Senior Citizen Welfare",
+    "description": "Free assistive devices — walking sticks, hearing aids, spectacles, wheelchairs — for senior citizens from poor households.",
+    "benefit": "Free assistive living devices based on age-related impairment",
+    "criteria": {
+      "min_age": 60,
+      "bpl_or_seci_listed": true
+    },
+    "documents": ["Aadhaar Card", "Age proof", "BPL Certificate"],
+    "apply_url": "https://vayoshri.aai.gov.in"
+  },
+  {
+    "id": "post_matric_scholarship",
+    "name": "Post-Matric Scholarship for SC/ST/OBC Students",
+    "category": "Education",
+    "description": "Tuition fee reimbursement and maintenance allowance for SC/ST/OBC students pursuing education beyond class 10.",
+    "benefit": "Full tuition fee coverage plus monthly maintenance allowance",
+    "criteria": {
+      "category_in": ["SC", "ST", "OBC"],
+      "currently_studying": true,
+      "max_income": 250000
+    },
+    "documents": ["Aadhaar Card", "Caste Certificate", "Income Certificate", "Previous mark sheet", "Bank passbook"],
+    "apply_url": "https://scholarships.gov.in"
+  },
+  {
+    "id": "stand_up_india",
+    "name": "Stand-Up India Scheme",
+    "category": "Employment & Self-Help",
+    "description": "Bank loans to support women entrepreneurs setting up new (greenfield) enterprises.",
+    "benefit": "Bank loans between ₹10 lakh and ₹1 crore",
+    "criteria": {
+      "gender_in": ["female"],
+      "occupation_in": ["entrepreneur", "self-employed", "small business owner"],
+      "min_age": 18
+    },
+    "documents": ["Aadhaar Card", "Business plan", "Category certificate (if applicable)", "Bank statement (6 months)"],
+    "apply_url": "https://www.standupmitra.in"
   }
 ]
