@@ -1,6 +1,7 @@
 """Converts a raw voice transcript (captured client-side via the Web Speech API,
-in English or Hindi) into a structured complaint draft: category, department,
-priority, a clean English description, and an area name if mentioned.
+in English or any of 8 other major Indian languages) into a structured
+complaint draft: category, department, priority, a clean English description,
+and an area name if mentioned.
 
 This lets a citizen just say something like:
   "Mere area mein street light kharab hai, Sector 12 Rohini mein"
@@ -78,9 +79,11 @@ def _enrich_area(result: Dict, transcript: str) -> Dict:
 def parse_voice_complaint(transcript: str, language: str = "en") -> Dict:
     ai_result = ai_client.ask_json(
         system_prompt=(
-            "You convert a citizen's spoken civic complaint (English, Hindi, or Hinglish, "
-            "transcribed from speech so it may be informal or slightly garbled) into a "
-            "structured JSON object for a municipal complaint system. Respond with ONLY JSON: "
+            "You convert a citizen's spoken civic complaint into a structured JSON object for a "
+            "municipal complaint system. The transcript may be in English or any major Indian "
+            "language — Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, or "
+            "Punjabi — in native script or Latin transliteration, and since it's transcribed from "
+            "speech it may be informal or slightly garbled. Respond with ONLY JSON: "
             "{ \"description_en\": clean one-sentence English description, "
             "\"category\": one of [streetlight, water_supply, drainage, garbage, road_pothole, "
             "electricity, illegal_construction, stray_animals, noise_pollution, traffic, general], "
