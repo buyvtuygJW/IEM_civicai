@@ -1,0 +1,157 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  color: #1E2749;
+  /* Soft "sunrise" gradient with three blurred colour fields standing in for
+     saffron / white / green — a light, glassy nod to the tricolour rather
+     than a literal flag reproduction. */
+  background:
+    radial-gradient(640px circle at 92% -8%, rgba(255, 153, 51, 0.22), transparent 60%),
+    radial-gradient(640px circle at -8% 108%, rgba(19, 136, 8, 0.16), transparent 60%),
+    radial-gradient(820px circle at 50% 35%, rgba(79, 70, 229, 0.10), transparent 60%),
+    linear-gradient(180deg, #EEF2FF 0%, #FDFDFF 45%, #FFF8F0 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* ---------- Eyebrow / section labels ---------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  color: #64748B;
+}
+.eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FF9933, #4F46E5 60%, #138808);
+  flex-shrink: 0;
+}
+
+/* ---------- Glass card ---------- */
+.ledger-card {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 32px -12px rgba(30, 39, 73, 0.18);
+  border-radius: 1.5rem !important; /* wins over any `rounded`/`rounded-md` utility on the same element */
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.ledger-card:hover {
+  box-shadow: 0 12px 36px -10px rgba(30, 39, 73, 0.22);
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 9999px !important; /* wins over `rounded` utility on the same element */
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 10px 24px -8px rgba(79, 70, 229, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 14px 28px -8px rgba(79, 70, 229, 0.6);
+}
+.btn-primary:disabled {
+  background: #C7CBDE !important;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(12px);
+  color: #1E2749 !important;
+  border: 1.5px solid rgba(79, 70, 229, 0.35) !important;
+  border-radius: 9999px !important; /* wins over `rounded` utility on the same element */
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: all 0.15s ease;
+}
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(79, 70, 229, 0.08) !important;
+  border-color: #4F46E5 !important;
+}
+
+/* ---------- Status pills (replaces the old "stamp" look) ---------- */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.stamp::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.stamp-submitted { color: #2563EB; background: rgba(37, 99, 235, 0.12); }
+.stamp-in_progress { color: #D97706; background: rgba(217, 119, 6, 0.14); }
+.stamp-resolved { color: #16A34A; background: rgba(22, 163, 74, 0.14); }
+.stamp-escalated { color: #E11D48; background: rgba(225, 29, 72, 0.14); }
+
+/* ---------- Chakra logomark rotation ---------- */
+@keyframes chakra-spin {
+  to { transform: rotate(360deg); }
+}
+.chakra-spin {
+  animation: chakra-spin 16s linear infinite;
+}
+
+/* ---------- Mic button pulse while listening ---------- */
+@keyframes mic-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.45); }
+  70% { box-shadow: 0 0 0 16px rgba(225, 29, 72, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+}
+.mic-listening {
+  animation: mic-pulse 1.4s infinite;
+}
+
+/* Focus visibility */
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid #4F46E5;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mic-listening, .chakra-spin { animation: none; }
+  html { scroll-behavior: auto; }
+}

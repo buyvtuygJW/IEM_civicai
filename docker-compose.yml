@@ -1,0 +1,35 @@
+services:
+  backend:
+    build: ./backend
+    container_name: civicai-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # All optional — leave blank/default to run fully offline with sane demo defaults.
+      # Set these in a .env file next to this docker-compose.yml, e.g.:
+      #   ANTHROPIC_API_KEY=sk-ant-...
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me-in-production}
+      - GOV_REGISTRATION_CODE=${GOV_REGISTRATION_CODE:-CIVIC-GOV-2026}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./civicai.db}
+    volumes:
+      # Mount source code for live-reload during development. The SQLite file
+      # (civicai.db) is created inside this same folder on your host machine,
+      # so demo data persists across `docker compose down`/`up` automatically.
+      - ./backend:/app
+    working_dir: /app
+
+  frontend:
+    build: ./frontend
+    container_name: civicai-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    volumes:
+      - ./frontend:/app
+      # Anonymous volume so the container's own node_modules (installed for
+      # the container's Linux platform) isn't shadowed by your host's copy.
+      - /app/node_modules
+    depends_on:
+      - backend

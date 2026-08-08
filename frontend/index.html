@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CivicAI — Gateway to Government Services</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Inter:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              // Core text/ink — deep indigo-navy, reads well on light glass surfaces
+              ink: "#1E2749",
+              // Legacy semantic names kept so existing components restyle automatically —
+              // remapped to the new light/glass/gradient palette:
+              paper: "#FFFFFF",       // glass card base (used with opacity)
+              paperdark: "#E7EAF6",   // soft glass border / hover tint
+              gold: "#FF9933",        // Indian flag saffron — primary accent
+              brick: "#E11D48",       // alerts / escalated
+              forest: "#16A34A",      // resolved / success
+              slate2: "#64748B",      // muted secondary text
+              // New tokens for the gradient system
+              flaggreen: "#138808",   // Indian flag green — Government module identity
+              brand: { indigo: "#4F46E5", blue: "#3B82F6" }, // primary gradient (CivicWatch identity)
+            },
+            fontFamily: {
+              display: ["Poppins", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="text-ink font-body antialiased">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,134 @@
+[
+  {
+    "id": "pm_kisan",
+    "name": "PM-KISAN Samman Nidhi",
+    "category": "Agriculture",
+    "description": "Income support of ₹6,000/year paid in 3 installments to landholding farmer families.",
+    "benefit": "₹6,000 per year (3 installments of ₹2,000)",
+    "criteria": {
+      "occupation_in": ["farmer"],
+      "owns_land": true,
+      "max_income": 300000
+    },
+    "documents": ["Aadhaar Card", "Land ownership records (Khatauni/Khasra)", "Bank passbook", "Passport-size photo"],
+    "apply_url": "https://pmkisan.gov.in"
+  },
+  {
+    "id": "ayushman_bharat",
+    "name": "Ayushman Bharat (PM-JAY)",
+    "category": "Health",
+    "description": "Health insurance cover of ₹5 lakh per family per year for secondary and tertiary hospitalisation.",
+    "benefit": "₹5,00,000 health cover per family/year",
+    "criteria": {
+      "max_income": 250000,
+      "bpl_or_seci_listed": true
+    },
+    "documents": ["Aadhaar Card", "Ration Card", "Income Certificate", "SECC family ID (if available)"],
+    "apply_url": "https://pmjay.gov.in"
+  },
+  {
+    "id": "pmay",
+    "name": "Pradhan Mantri Awas Yojana",
+    "category": "Housing",
+    "description": "Financial assistance for construction/purchase of a pucca house for eligible families without one.",
+    "benefit": "Interest subsidy up to ₹2.67 lakh / direct assistance up to ₹1.2-2.5 lakh",
+    "criteria": {
+      "max_income": 1800000,
+      "owns_pucca_house": false
+    },
+    "documents": ["Aadhaar Card", "Income Certificate", "Land/property documents", "Bank passbook"],
+    "apply_url": "https://pmaymis.gov.in"
+  },
+  {
+    "id": "sukanya_samriddhi",
+    "name": "Sukanya Samriddhi Yojana",
+    "category": "Girl Child Welfare",
+    "description": "Small savings scheme for the girl child with attractive interest rate and tax benefits.",
+    "benefit": "High-interest savings account, tax-free maturity",
+    "criteria": {
+      "has_girl_child_under_10": true
+    },
+    "documents": ["Girl child's birth certificate", "Aadhaar Card (guardian)", "Address proof"],
+    "apply_url": "https://www.nsiindia.gov.in"
+  },
+  {
+    "id": "nsap_old_age",
+    "name": "National Social Assistance Programme - Old Age Pension",
+    "category": "Social Security",
+    "description": "Monthly pension for elderly citizens living below the poverty line.",
+    "benefit": "₹200-500+ monthly pension (state top-ups vary)",
+    "criteria": {
+      "min_age": 60,
+      "bpl_or_seci_listed": true
+    },
+    "documents": ["Aadhaar Card", "Age proof", "BPL Certificate", "Bank passbook"],
+    "apply_url": "https://nsap.nic.in"
+  },
+  {
+    "id": "pm_ujjwala",
+    "name": "Pradhan Mantri Ujjwala Yojana",
+    "category": "Women & Household",
+    "description": "Free LPG gas connection to women from below-poverty-line households.",
+    "benefit": "Free LPG connection + first refill",
+    "criteria": {
+      "gender_in": ["female"],
+      "bpl_or_seci_listed": true
+    },
+    "documents": ["Aadhaar Card", "BPL Ration Card", "Bank passbook", "Passport-size photo"],
+    "apply_url": "https://pmuy.gov.in"
+  },
+  {
+    "id": "pm_scholarship",
+    "name": "National Means-cum-Merit Scholarship",
+    "category": "Education",
+    "description": "Scholarship for meritorious students from economically weaker sections to prevent dropout at class 9-12.",
+    "benefit": "₹12,000 per year",
+    "criteria": {
+      "occupation_in": ["student"],
+      "max_income": 350000,
+      "min_age": 13,
+      "max_age": 20
+    },
+    "documents": ["Aadhaar Card", "Income Certificate", "Previous year mark sheet", "Bank passbook"],
+    "apply_url": "https://scholarships.gov.in"
+  },
+  {
+    "id": "mudra_yojana",
+    "name": "Pradhan Mantri MUDRA Yojana",
+    "category": "Employment & Self-Help",
+    "description": "Collateral-free loans up to ₹10 lakh for non-corporate, non-farm small/micro enterprises.",
+    "benefit": "Loans from ₹50,000 up to ₹10,00,000",
+    "criteria": {
+      "occupation_in": ["self-employed", "small business owner", "entrepreneur"],
+      "min_age": 18
+    },
+    "documents": ["Aadhaar Card", "Business proof", "Bank statement (6 months)", "Passport-size photo"],
+    "apply_url": "https://www.mudra.org.in"
+  },
+  {
+    "id": "pmuy_disability",
+    "name": "Disability Pension Scheme",
+    "category": "Social Security",
+    "description": "Monthly pension for persons with 80%+ disability from economically weaker households.",
+    "benefit": "₹300-500+ monthly pension (state top-ups vary)",
+    "criteria": {
+      "has_disability": true,
+      "max_income": 200000
+    },
+    "documents": ["Aadhaar Card", "Disability Certificate (UDID)", "Income Certificate", "Bank passbook"],
+    "apply_url": "https://nsap.nic.in"
+  },
+  {
+    "id": "pm_svanidhi",
+    "name": "PM SVANidhi",
+    "category": "Employment & Self-Help",
+    "description": "Working capital loan for street vendors to restart their businesses.",
+    "benefit": "Collateral-free loan up to ₹50,000 in three tranches",
+    "criteria": {
+      "occupation_in": ["street vendor", "self-employed"],
+      "min_age": 18
+    },
+    "documents": ["Aadhaar Card", "Vending Certificate/ID (if available)", "Bank passbook"],
+    "apply_url": "https://pmsvanidhi.mohua.gov.in"
+  }
+]
