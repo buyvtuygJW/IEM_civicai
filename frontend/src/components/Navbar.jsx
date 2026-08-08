@@ -48,7 +48,7 @@ export default function Navbar() {
         <NavLink to="/" className="flex items-center gap-2 shrink-0" onClick={() => setMobileOpen(false)}>
           <ChakraIcon size={30} id="chakraNav" />
           <span className="font-display font-bold text-lg bg-gradient-to-r from-orange-500 via-indigo-600 to-green-600 bg-clip-text text-transparent">
-            IndiCivicAI
+            HindCivicAi
           </span>
         </NavLink>
 

@@ -1,7 +1,7 @@
 services:
   backend:
     build: ./backend
-    container_name: indicivicai-backend
+    container_name: HindCivicAi-backend
     ports:
       - "8000:8000"
     environment:
@@ -14,17 +14,17 @@ services:
       - AI_MODEL=${AI_MODEL:-}
       - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me-in-production}
       - GOV_REGISTRATION_CODE=${GOV_REGISTRATION_CODE:-CIVIC-GOV-2026}
-      - DATABASE_URL=${DATABASE_URL:-sqlite:///./indicivicai.db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./HindCivicAi.db}
     volumes:
       # Mount source code for live-reload during development. The SQLite file
-      # (indicivicai.db) is created inside this same folder on your host machine,
+      # (HindCivicAi.db) is created inside this same folder on your host machine,
       # so demo data persists across `docker compose down`/`up` automatically.
       - ./backend:/app
     working_dir: /app
 
   frontend:
     build: ./frontend
-    container_name: indicivicai-frontend
+    container_name: HindCivicAi-frontend
     ports:
       - "5173:5173"
     environment:

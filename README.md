@@ -1,4 +1,4 @@
-# IndiCivicAI
+# HindCivicAi
 
 File and track civic complaints by **voice or text** in 9 Indian languages, auto-route them to the right department, and check **welfare-scheme eligibility** with an AI Welfare Copilot.
 
@@ -49,7 +49,7 @@ app. **Gemini is free, no card required** — grab a key at
 
 ## 3. Use it
 
-- **File a complaint** — tap the mic and speak, or type it. IndiCivicAI detects
+- **File a complaint** — tap the mic and speak, or type it. HindCivicAi detects
   the category, department, and priority, and pins the locality.
 - **Track a complaint** — look it up any time by its case number.
 - **Welfare Copilot** — enter your profile (age, income, occupation, state) to
@@ -72,14 +72,14 @@ For developers — not needed to use the app.
 
 ## Database
 
-A real **on-disk SQLite file** at `backend/indicivicai.db` (not in-memory),
+A real **on-disk SQLite file** at `backend/HindCivicAi.db` (not in-memory),
 created and seeded on first boot and persisting across restarts and
 `docker compose down`/`up` (the `backend` folder is bind-mounted). It is
 gitignored. Delete it to reset all data. To scale, point `DATABASE_URL` at
 Postgres — no code changes:
 
 ```ini
-DATABASE_URL=postgresql://user:password@host:5432/indicivicai
+DATABASE_URL=postgresql://user:password@host:5432/HindCivicAi
 ```
 
 ## AI integration

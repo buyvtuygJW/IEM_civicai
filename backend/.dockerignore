@@ -2,4 +2,4 @@ venv/
 __pycache__/
 *.pyc
 .env
-indicivicai.db
+HindCivicAi.db

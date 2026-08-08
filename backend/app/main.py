@@ -11,7 +11,7 @@ from .services import ai_client
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="IndiCivicAI API",
+    title="HindCivicAi API",
     description="AI-powered gateway to government services and local governance.",
     version="0.1.0",
 )

@@ -1,6 +1,6 @@
 """Optional LLM integration — bring your own key (Anthropic, OpenAI, *or* Gemini).
 
-IndiCivicAI is designed to work fully offline with rule-based logic so the demo
+HindCivicAi is designed to work fully offline with rule-based logic so the demo
 never breaks without internet/API access. If an API key is present in the
 environment, several services upgrade to use an LLM for smarter classification,
 voice-transcript parsing, and natural-language eligibility explanations.

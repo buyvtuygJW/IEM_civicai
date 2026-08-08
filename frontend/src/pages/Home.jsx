@@ -47,7 +47,7 @@ export default function Home() {
           </h2>
           <p className="text-ink/70 leading-relaxed mb-8 max-w-xl">
             Two problems, one system: citizens don't always know what they're owed, and
-            complaints can disappear into silence. IndiCivicAI fixes both — find out what you're
+            complaints can disappear into silence. HindCivicAi fixes both — find out what you're
             eligible for, and make sure what you report actually gets fixed.
           </p>
           <div className="flex flex-wrap gap-3">

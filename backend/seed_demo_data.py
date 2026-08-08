@@ -1,4 +1,4 @@
-"""Run this once after first install to populate IndiCivicAI with realistic demo
+"""Run this once after first install to populate HindCivicAi with realistic demo
 data so the Government Dashboard has something to show immediately:
 
     python seed_demo_data.py

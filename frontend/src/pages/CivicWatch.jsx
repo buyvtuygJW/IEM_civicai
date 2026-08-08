@@ -99,10 +99,7 @@ export default function CivicWatch() {
       <h2 className="font-display text-3xl font-bold text-ink mb-2">
         Report a problem. Track it. Make sure it gets resolved.
       </h2>
-      <p className="text-ink/70 max-w-2xl mb-6">
-        Speak or type your complaint. IndiCivicAI classifies it and routes it to the responsible
-        authority — only they can update its status, but you can always check progress here.
-      </p>
+      <p className="text-ink/70 max-w-2xl mb-6">Speak or type your complaint, HindCivicAi classifies it and routes it to the responsible authority. you can always check progress here. </p>
 
       <div className="flex items-center gap-2 text-xs font-mono mb-6">
         <LocateFixed size={14} className={locationStatus === "granted" ? "text-forest" : "text-slate2"} />

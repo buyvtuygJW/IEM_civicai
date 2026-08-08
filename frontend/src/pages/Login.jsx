@@ -50,7 +50,7 @@ export default function Login() {
         <p className="eyebrow">Sign in</p>
       </div>
       <h2 className="font-display text-3xl font-bold text-center mb-8 bg-gradient-to-r from-orange-500 via-indigo-600 to-green-600 bg-clip-text text-transparent">
-        Welcome back to IndiCivicAI
+        Welcome back to HindCivicAi
       </h2>
 
       <form onSubmit={submit} className="ledger-card rounded-md p-6 space-y-4">

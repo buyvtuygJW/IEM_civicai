@@ -17,7 +17,7 @@ devnote
 *.db-journal
 *.db-wal
 *.db-shm
-indicivicai.db
+HindCivicAi.db
 
 # ─────────────────────────────────────────────────────────────
 # Python

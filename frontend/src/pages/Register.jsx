@@ -53,7 +53,7 @@ export default function Register() {
         <p className="eyebrow">Create an account</p>
       </div>
       <h2 className="font-display text-3xl font-bold text-center mb-6 bg-gradient-to-r from-orange-500 via-indigo-600 to-green-600 bg-clip-text text-transparent">
-        Join IndiCivicAI
+        Join HindCivicAi
       </h2>
 
       <div className="flex gap-2 mb-6 p-1 rounded-full bg-white/50 backdrop-blur border border-white/70">

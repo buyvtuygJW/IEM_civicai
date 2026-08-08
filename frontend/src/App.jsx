@@ -51,7 +51,7 @@ export default function App() {
           </Routes>
         </main>
         <footer className="max-w-6xl mx-auto px-6 py-10 mt-10 border-t border-ink/15 text-xs font-mono text-slate2">
-          IndiCivicAI — built for IEMHACKS 4.0. Demo data only; not affiliated with any government body.
+          HindCivicAi — built for IEMHACKS 4.0. Demo data only; not affiliated with any government body.
         </footer>
       </div>
     </AuthProvider>

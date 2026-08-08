@@ -274,9 +274,7 @@ export default function WelfareCopilot() {
         What government benefits am I eligible for?
       </h2>
       <p className="text-ink/70 max-w-2xl mb-3">
-        Fill in as much as you're comfortable sharing — nothing is stored beyond this session
-        except an anonymous count used for the government dashboard's scheme-adoption stats.
-        The more questions you answer, the more schemes we can accurately match you to.
+       Fill in what you're comfortable with — we'll match you to the right government schemes, and only an anonymous count is kept for state-level scheme-adoption tracking.
       </p>
       <Link
         to="/register?role=government"
