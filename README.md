@@ -1,67 +1,31 @@
 # CivicAI
 
-An AI-powered gateway to government services and local governance for India:
-file & track civic complaints (by voice or text, in multiple Indian languages),
-auto-route them to the right department, and check welfare-scheme eligibility
-with a Welfare Copilot.
-
-- **Backend:** FastAPI + SQLAlchemy (SQLite by default)
-- **Frontend:** React + Vite
-- **AI:** bring your own **Anthropic** *or* **OpenAI** key — or run fully offline
+File and track civic complaints by **voice or text** in multiple Indian
+languages, auto-route them to the right department, and check **welfare-scheme
+eligibility** with an AI Welfare Copilot.
 
 ---
 
-## 🔑 First: add your own AI key (recommended)
+# 📖 User Guide
 
-CivicAI runs **offline** on rule-based logic with no key at all — nothing will
-crash. But complaint classification, multilingual voice parsing, and the Welfare
-Copilot chat are **noticeably better with an LLM**, so the recommended first
-step is to plug in **your own key**.
+## 1. Run it
 
-1. Copy the example env file:
-   ```bash
-   cp .env.example .env          # for Docker (repo root)
-   # or, when running the backend directly:
-   cp backend/.env.example backend/.env
-   ```
-2. Open `.env` and set **one** of these to your own key:
-   ```ini
-   ANTHROPIC_API_KEY=sk-ant-...   # uses Claude   (takes priority if both set)
-   OPENAI_API_KEY=sk-...          # uses OpenAI
-   # optional: pin a model. Defaults: claude-sonnet-5 / gpt-4o-mini
-   AI_MODEL=
-   ```
-
-> The key is read **only** from the environment — it is never hardcoded or
-> committed. `.env` (and the local `civicai.db`) are gitignored. Confirm the app
-> picked it up at `GET /api/health` → `{"ai": {"enabled": true, "provider": ...}}`.
-
-If you leave both keys blank, everything still works — the app transparently
-falls back to keyword/rule-based logic.
-
----
-
-## Quick start
-
-### Option A — Docker (everything at once)
+### Docker (easiest — runs everything)
 
 ```bash
-cp .env.example .env      # add your AI key (see above); optional but recommended
 docker compose up --build
 ```
 
-- Frontend → http://localhost:5173
-- Backend  → http://localhost:8000  (API docs at `/docs`)
+- App:      http://localhost:5173
+- API:      http://localhost:8000
 
-### Option B — Run each service directly
+### Or run the two services yourself
 
 **Backend**
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env       # add your AI key
-python seed_demo_data.py   # optional: load demo schemes + sample complaints
 uvicorn app.main:app --reload
 ```
 
@@ -72,63 +36,95 @@ npm install
 npm run dev
 ```
 
----
+## 2. Add your own AI key (recommended)
 
-## Data & persistence
+The app **works out of the box with no key** — but complaint classification,
+voice parsing, and the Welfare Copilot are much smarter with an LLM. Plug in
+**your own** Anthropic or OpenAI key:
 
-The database is a **real, on-disk SQLite file** (not in-memory), created at
-`backend/civicai.db` on first boot and seeded by `seed_demo_data.py`. It
-persists across restarts (and across `docker compose down`/`up`, since the
-`backend` folder is bind-mounted). It is gitignored.
-
-To move off SQLite, point `DATABASE_URL` at any SQLAlchemy-supported database —
-no code changes needed:
-
-```ini
-DATABASE_URL=postgresql://user:password@host:5432/civicai
+```bash
+cp .env.example .env          # (Docker, repo root)
+# or:  cp backend/.env.example backend/.env   (running the backend directly)
 ```
 
-To reset all data, stop the app and delete `backend/civicai.db`.
+Then open `.env` and set **one** key:
+
+```ini
+ANTHROPIC_API_KEY=sk-ant-...   # uses Claude  (wins if both are set)
+OPENAI_API_KEY=sk-...          # uses OpenAI
+```
+
+Restart the app. That's it.
+
+## 3. Use it
+
+- **File a complaint** — tap the mic and speak (English/Hindi/other Indian
+  languages), or type it. CivicAI figures out the category, department, and
+  priority, and pins the locality.
+- **Track a complaint** — look it up any time by its case number.
+- **Welfare Copilot** — fill in your profile (age, income, occupation, state)
+  to see which government schemes you qualify for and what documents you need.
+
+> **Voice tip:** use **Chrome or Edge** and allow the microphone. Speech-to-text
+> runs in your browser and needs an internet connection.
 
 ---
+---
 
-## How the AI features work (and their offline fallback)
+# 🛠️ Technical Reference
+
+Everything below is for developers — you don't need it to use the app.
+
+## Stack
+
+- **Backend:** FastAPI + SQLAlchemy (SQLite by default) — `backend/`
+- **Frontend:** React + Vite — `frontend/`
+- **AI:** pluggable Anthropic **or** OpenAI, with a full offline fallback
+
+## Database & persistence
+
+- A **real on-disk SQLite file** (not in-memory) at `backend/civicai.db`,
+  created on first boot and seeded by `seed_demo_data.py`.
+- Persists across restarts and `docker compose down`/`up` (the `backend` folder
+  is bind-mounted). It is gitignored.
+- Reset all data: stop the app and delete `backend/civicai.db`.
+- Swap databases with no code changes:
+  `DATABASE_URL=postgresql://user:password@host:5432/civicai`.
+
+## AI integration
+
+Provider is auto-selected from whichever key is set (`ANTHROPIC_API_KEY` takes
+priority, else `OPENAI_API_KEY`); the key is read **only** from the environment
+and never committed. Verify at `GET /api/health` →
+`{"ai": {"enabled": true, "provider": "..."}}`.
+
+Every AI call fails soft — on any error it returns `None` and the caller uses
+rule-based logic instead:
 
 | Feature | With a key | Offline (no key) |
 | --- | --- | --- |
 | Complaint classification | LLM assigns category / department / priority | keyword rules across Indian languages |
-| Voice complaint parsing | LLM cleans & structures the transcript | lightweight Hinglish→English gloss + regex |
-| Welfare Copilot chat | free-form Q&A grounded in the scheme list | helpful canned guidance |
+| Voice parsing | LLM cleans & structures the transcript | Hinglish→English gloss + regex |
+| Welfare Copilot chat | free-form Q&A grounded in the scheme list | canned guidance |
 
-**Speech-to-text is the browser's job, not the server's.** Voice input uses the
-browser's built-in Web Speech API (Chrome/Edge, needs internet); the backend
-only ever receives the finished **text** transcript.
+Speech-to-text itself is **not** in the backend — it's the browser's Web Speech
+API. The server only receives the finished text transcript.
 
----
+## Location resolution
 
-## Location resolution (all Indian states + UTs)
+A single shared India gazetteer (`backend/app/services/place_resolver.py`, data
+in `backend/seed_data/india_places.json`) canonicalizes every complaint's area,
+whichever path produced it (LLM or rule-based):
 
-Every complaint's area — whether extracted by the LLM or by the rule-based
-parser — is funnelled through a single shared **India gazetteer**
-(`backend/app/services/place_resolver.py`, data in
-`backend/seed_data/india_places.json`). It:
-
-- covers **all 28 states + 8 union territories**, with aliases (including some
+- covers **all 28 states + 8 union territories** with aliases (incl. some
   native-script and colloquial names) and major cities/districts;
-- canonicalizes messy input so `bengaluru`, `Bangalore`, and `blr` all become
-  **`Bengaluru, Karnataka`** — keeping complaint analytics consistent;
-- keeps a genuine but unrecognised locality **verbatim** rather than dropping it;
-- normalizes the welfare profile's state (`orissa` → `Odisha`) and powers an
-  optional `state_in` eligibility criterion for state-specific schemes.
+- normalizes messy input — `bengaluru` / `Bangalore` / `blr` → `Bengaluru,
+  Karnataka` — so analytics group consistently;
+- keeps a real-but-unrecognised locality **verbatim** instead of dropping it;
+- normalizes the welfare profile state (`orissa` → `Odisha`) and powers an
+  optional `state_in` eligibility criterion.
 
-Endpoint: `GET /api/welfare/states` returns the full list (`{code, name,
-capital, type}`) — handy for a profile dropdown.
-
-> Coverage is states/UTs + major cities/districts, not every village. For
-> village/ward-level coverage, load a [GeoNames](https://www.geonames.org/) `IN`
-> dump into the same JSON shape.
-
----
+`GET /api/welfare/states` returns the full list (`{code, name, capital, type}`).
 
 ## Environment variables
 
@@ -137,8 +133,18 @@ capital, type}`) — handy for a profile dropdown.
 | `ANTHROPIC_API_KEY` | *(empty)* | Use Claude. Priority if both keys set. |
 | `OPENAI_API_KEY` | *(empty)* | Use OpenAI. |
 | `AI_MODEL` | `claude-sonnet-5` / `gpt-4o-mini` | Override the model. |
-| `JWT_SECRET` | `dev-secret-change-me-in-production` | Signs login tokens. **Change for real deployments.** |
-| `GOV_REGISTRATION_CODE` | `CIVIC-GOV-2026` | Shared code to register a government account. **Change for real deployments.** |
+| `JWT_SECRET` | `dev-secret-change-me-in-production` | Signs login tokens. **Change for production.** |
+| `GOV_REGISTRATION_CODE` | `CIVIC-GOV-2026` | Code to register a government account. **Change for production.** |
 | `DATABASE_URL` | `sqlite:///./civicai.db` | Database connection string. |
 
-All are optional for a local demo — safe defaults are baked in.
+## Possible improvements
+
+- **Village/ward-level places:** current coverage is states/UTs + major cities.
+  Load a [GeoNames](https://www.geonames.org/) `IN` dump into the same JSON
+  shape for full granularity.
+- **Auth hardening:** replace the shared `GOV_REGISTRATION_CODE` with SSO or
+  admin approval; set a strong `JWT_SECRET`; restrict CORS (currently `*`).
+- **State as a first-class field:** complaints fold state into the area string;
+  a dedicated `state` column would enable richer dashboard grouping.
+- **Ambiguous place names** (e.g. a city name shared by two states) currently
+  resolve to the first match — add population/GPS-based disambiguation.
