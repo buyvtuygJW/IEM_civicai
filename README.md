@@ -38,25 +38,16 @@ npm run dev
 
 ## 2. Add your own AI key (recommended)
 
-The app **works out of the box with no key** — but complaint classification,
-voice parsing, and the Welfare Copilot are much smarter with an LLM. Plug in
-**your own** Anthropic or OpenAI key:
+Works with no key, but classification/voice/chat are smarter with an LLM.
 
 ```bash
 cp .env.example .env          # (Docker, repo root)
 # or:  cp backend/.env.example backend/.env   (running the backend directly)
 ```
 
-Then open `.env` and set **one** key:
-
-```ini
-ANTHROPIC_API_KEY=sk-ant-...   # uses Claude  (wins if more than one is set)
-OPENAI_API_KEY=sk-...          # uses OpenAI
-GEMINI_API_KEY=...             # uses Gemini — genuinely free tier, no card needed:
-                                #   https://aistudio.google.com/apikey
-```
-
-Restart the app. That's it.
+Set **one** key in `.env` (see comments there for priority order) — Gemini
+is free, no card: [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
+Restart the app.
 
 ## 3. Use it
 
@@ -95,13 +86,9 @@ Everything below is for developers — you don't need it to use the app.
 
 ## AI integration
 
-Provider is auto-selected from whichever key is set (`ANTHROPIC_API_KEY` takes
-priority, then `OPENAI_API_KEY`, then `GEMINI_API_KEY`); the key is read
-**only** from the environment and never committed. Gemini has a genuinely free
-tier — grab a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey),
-no credit card required — making it the easiest way to try the AI-powered path
-without spending anything. Verify at `GET /api/health` →
-`{"ai": {"enabled": true, "provider": "..."}}`.
+Provider auto-selects from whichever key is set — see `.env.example` for
+priority order. Key is read from the environment only, never committed.
+Verify with `GET /api/health` → `{"ai": {"enabled": true, "provider": "..."}}`.
 
 Every AI call fails soft — on any error it returns `None` and the caller uses
 rule-based logic instead:
@@ -111,6 +98,17 @@ rule-based logic instead:
 | Complaint classification | LLM assigns category / department / priority | keyword rules across Indian languages |
 | Voice parsing | LLM cleans & structures the transcript | Hinglish→English gloss + regex |
 | Welfare Copilot chat | free-form Q&A grounded in the scheme list | canned guidance |
+
+## Language support
+
+CivicWatch accepts voice or text complaints in **9 languages**: English, Hindi,
+Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, and Punjabi —
+selectable from the mic dropdown in `VoiceInput.jsx`. With an AI key set, the
+LLM handles all nine (native script or Latin transliteration) far more
+robustly than any fixed keyword list could. Offline, `classifier.py`'s
+keyword fallback includes a handful of hand-picked native-script keywords per
+category for each of the 8 non-English/Hindi languages — enough to cover the
+single most common word for each issue type, not exhaustive vocabulary.
 
 Speech-to-text itself is **not** in the backend — it's the browser's Web Speech
 API. The server only receives the finished text transcript.
@@ -135,10 +133,10 @@ whichever path produced it (LLM or rule-based):
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | *(empty)* | Use Claude. Priority if more than one key is set. |
-| `OPENAI_API_KEY` | *(empty)* | Use OpenAI. Next priority. |
-| `GEMINI_API_KEY` | *(empty)* | Use Gemini (also accepts `GOOGLE_API_KEY`). Free tier, no card required — [aistudio.google.com/apikey](https://aistudio.google.com/apikey). |
-| `AI_MODEL` | `claude-sonnet-5` / `gpt-4o-mini` / `gemini-flash-latest` | Override the model. |
+| `ANTHROPIC_API_KEY` | *(empty)* | Use Claude. See `.env.example` for priority order. |
+| `OPENAI_API_KEY` | *(empty)* | Use OpenAI. |
+| `GEMINI_API_KEY` | *(empty)* | Use Gemini (also accepts `GOOGLE_API_KEY`). Free, no card — [aistudio.google.com/apikey](https://aistudio.google.com/apikey). |
+| `AI_MODEL` | *(provider default)* | Override the model. |
 | `JWT_SECRET` | `dev-secret-change-me-in-production` | Signs login tokens. **Change for production.** |
 | `GOV_REGISTRATION_CODE` | `CIVIC-GOV-2026` | Code to register a government account. **Change for production.** |
 | `DATABASE_URL` | `sqlite:///./indicivicai.db` | Database connection string. |
