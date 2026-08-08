@@ -16,12 +16,13 @@
 *.db-journal
 *.db-wal
 *.db-shm
-civicai.db
+indicivicai.db
 
 # ─────────────────────────────────────────────────────────────
 # Python
 # ─────────────────────────────────────────────────────────────
 __pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 *.so

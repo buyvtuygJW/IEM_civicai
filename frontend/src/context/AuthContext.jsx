@@ -3,7 +3,7 @@ import { setAuthToken, fetchMe } from "../api";
 
 const AuthContext = createContext(null);
 
-const STORAGE_KEY = "civicai_token";
+const STORAGE_KEY = "indicivicai_token";
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem(STORAGE_KEY));

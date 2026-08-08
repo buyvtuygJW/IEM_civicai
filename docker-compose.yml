@@ -1,7 +1,7 @@
 services:
   backend:
     build: ./backend
-    container_name: civicai-backend
+    container_name: indicivicai-backend
     ports:
       - "8000:8000"
     environment:
@@ -10,20 +10,21 @@ services:
       #   ANTHROPIC_API_KEY=sk-ant-...
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       - AI_MODEL=${AI_MODEL:-}
       - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me-in-production}
       - GOV_REGISTRATION_CODE=${GOV_REGISTRATION_CODE:-CIVIC-GOV-2026}
-      - DATABASE_URL=${DATABASE_URL:-sqlite:///./civicai.db}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./indicivicai.db}
     volumes:
       # Mount source code for live-reload during development. The SQLite file
-      # (civicai.db) is created inside this same folder on your host machine,
+      # (indicivicai.db) is created inside this same folder on your host machine,
       # so demo data persists across `docker compose down`/`up` automatically.
       - ./backend:/app
     working_dir: /app
 
   frontend:
     build: ./frontend
-    container_name: civicai-frontend
+    container_name: indicivicai-frontend
     ports:
       - "5173:5173"
     environment:

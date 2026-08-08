@@ -74,7 +74,7 @@ def welfare_chat(payload: schemas.ChatMessage):
             "I can help you check eligibility for schemes like PM-KISAN, Ayushman Bharat, "
             "PMAY, and more. Try filling in your profile (age, income, occupation, state) "
             "and I'll show you exactly what you qualify for and which documents to prepare. "
-            "(Set an ANTHROPIC_API_KEY or OPENAI_API_KEY for free-form Q&A.)"
+            "(Set an ANTHROPIC_API_KEY, OPENAI_API_KEY, or free GEMINI_API_KEY for free-form Q&A.)"
         )
 
     return {"answer": answer}

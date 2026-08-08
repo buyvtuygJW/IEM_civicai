@@ -1,4 +1,4 @@
-# CivicAI
+# IndiCivicAI
 
 File and track civic complaints by **voice or text** in multiple Indian
 languages, auto-route them to the right department, and check **welfare-scheme
@@ -50,8 +50,10 @@ cp .env.example .env          # (Docker, repo root)
 Then open `.env` and set **one** key:
 
 ```ini
-ANTHROPIC_API_KEY=sk-ant-...   # uses Claude  (wins if both are set)
+ANTHROPIC_API_KEY=sk-ant-...   # uses Claude  (wins if more than one is set)
 OPENAI_API_KEY=sk-...          # uses OpenAI
+GEMINI_API_KEY=...             # uses Gemini — genuinely free tier, no card needed:
+                                #   https://aistudio.google.com/apikey
 ```
 
 Restart the app. That's it.
@@ -59,7 +61,7 @@ Restart the app. That's it.
 ## 3. Use it
 
 - **File a complaint** — tap the mic and speak (English/Hindi/other Indian
-  languages), or type it. CivicAI figures out the category, department, and
+  languages), or type it. IndiCivicAI figures out the category, department, and
   priority, and pins the locality.
 - **Track a complaint** — look it up any time by its case number.
 - **Welfare Copilot** — fill in your profile (age, income, occupation, state)
@@ -79,23 +81,26 @@ Everything below is for developers — you don't need it to use the app.
 
 - **Backend:** FastAPI + SQLAlchemy (SQLite by default) — `backend/`
 - **Frontend:** React + Vite — `frontend/`
-- **AI:** pluggable Anthropic **or** OpenAI, with a full offline fallback
+- **AI:** pluggable Anthropic, OpenAI, **or** Gemini, with a full offline fallback
 
 ## Database & persistence
 
-- A **real on-disk SQLite file** (not in-memory) at `backend/civicai.db`,
+- A **real on-disk SQLite file** (not in-memory) at `backend/indicivicai.db`,
   created on first boot and seeded by `seed_demo_data.py`.
 - Persists across restarts and `docker compose down`/`up` (the `backend` folder
   is bind-mounted). It is gitignored.
-- Reset all data: stop the app and delete `backend/civicai.db`.
+- Reset all data: stop the app and delete `backend/indicivicai.db`.
 - Swap databases with no code changes:
-  `DATABASE_URL=postgresql://user:password@host:5432/civicai`.
+  `DATABASE_URL=postgresql://user:password@host:5432/indicivicai`.
 
 ## AI integration
 
 Provider is auto-selected from whichever key is set (`ANTHROPIC_API_KEY` takes
-priority, else `OPENAI_API_KEY`); the key is read **only** from the environment
-and never committed. Verify at `GET /api/health` →
+priority, then `OPENAI_API_KEY`, then `GEMINI_API_KEY`); the key is read
+**only** from the environment and never committed. Gemini has a genuinely free
+tier — grab a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey),
+no credit card required — making it the easiest way to try the AI-powered path
+without spending anything. Verify at `GET /api/health` →
 `{"ai": {"enabled": true, "provider": "..."}}`.
 
 Every AI call fails soft — on any error it returns `None` and the caller uses
@@ -130,12 +135,13 @@ whichever path produced it (LLM or rule-based):
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | *(empty)* | Use Claude. Priority if both keys set. |
-| `OPENAI_API_KEY` | *(empty)* | Use OpenAI. |
-| `AI_MODEL` | `claude-sonnet-5` / `gpt-4o-mini` | Override the model. |
+| `ANTHROPIC_API_KEY` | *(empty)* | Use Claude. Priority if more than one key is set. |
+| `OPENAI_API_KEY` | *(empty)* | Use OpenAI. Next priority. |
+| `GEMINI_API_KEY` | *(empty)* | Use Gemini (also accepts `GOOGLE_API_KEY`). Free tier, no card required — [aistudio.google.com/apikey](https://aistudio.google.com/apikey). |
+| `AI_MODEL` | `claude-sonnet-5` / `gpt-4o-mini` / `gemini-flash-latest` | Override the model. |
 | `JWT_SECRET` | `dev-secret-change-me-in-production` | Signs login tokens. **Change for production.** |
 | `GOV_REGISTRATION_CODE` | `CIVIC-GOV-2026` | Code to register a government account. **Change for production.** |
-| `DATABASE_URL` | `sqlite:///./civicai.db` | Database connection string. |
+| `DATABASE_URL` | `sqlite:///./indicivicai.db` | Database connection string. |
 
 ## Possible improvements
 

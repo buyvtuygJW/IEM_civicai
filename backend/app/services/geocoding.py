@@ -16,7 +16,7 @@ import requests
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/reverse"
 
 # Nominatim's usage policy requires a descriptive User-Agent identifying the app.
-HEADERS = {"User-Agent": "CivicAI-Hackathon-Demo/1.0 (civic complaint routing)"}
+HEADERS = {"User-Agent": "IndiCivicAI-Hackathon-Demo/1.0 (civic complaint routing)"}
 
 
 def reverse_geocode(lat, lng) -> str | None:

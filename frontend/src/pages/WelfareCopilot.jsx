@@ -99,31 +99,91 @@ function SchemeCard({ scheme }) {
   );
 }
 
+// Format/range checks — apply to ANY non-blank value, in the form or the chat
+// box, because a garbled value (letters pasted into age, a negative income)
+// should never go out over the wire no matter which control triggered it.
+// Leaving a field blank is not an error here — that's a legitimate "prefer
+// not to say" and is handled separately by requiredErrors below.
+function formatErrors(p) {
+  const errs = {};
+  if (p.age !== "" && p.age != null) {
+    const n = Number(p.age);
+    if (!Number.isInteger(n) || n < 0 || n > 120) {
+      errs.age = "Enter a whole number between 0 and 120.";
+    }
+  }
+  if (p.annual_income !== "" && p.annual_income != null) {
+    const n = Number(p.annual_income);
+    if (Number.isNaN(n) || n < 0) {
+      errs.annual_income = "Enter a valid, non-negative amount.";
+    }
+  }
+  return errs;
+}
+
+// Fields the eligibility check can't meaningfully run without — almost every
+// scheme filters by age, and many by state, so submitting blank here doesn't
+// warn the person, it just silently returns nothing useful. The chat box
+// doesn't use these — it works fine with zero profile info.
+function requiredErrors(p) {
+  const errs = {};
+  if (p.age === "" || p.age == null) errs.age = "Age is required — most schemes filter by age.";
+  if (!p.state) errs.state = "State is required — many schemes are state-specific.";
+  return errs;
+}
+
 export default function WelfareCopilot() {
   const [profile, setProfile] = useState(emptyProfile);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  // Format errors (garbled/out-of-range values) are flagged live from the
+  // first keystroke — that's never okay regardless of whether the person has
+  // tried to submit yet. Required-field nagging ("Age is required") only
+  // kicks in after a first submit/send attempt, so a pristine empty form
+  // doesn't greet the person with red boxes before they've done anything.
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [chatLog, setChatLog] = useState([
     { role: "assistant", text: "Hi! I'm your Welfare Copilot. Fill in your details, or just ask me a question below — e.g. 'What documents do I need for PM-KISAN?'" },
   ]);
   const [chatInput, setChatInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
 
-  const set = (key, value) => setProfile((p) => ({ ...p, [key]: value }));
+  const set = (key, value) => {
+    const next = { ...profile, [key]: value };
+    setProfile(next);
+    setErrors(attemptedSubmit ? { ...formatErrors(next), ...requiredErrors(next) } : formatErrors(next));
+  };
+
+  // The form keeps age/annual_income as strings (including "" before the user
+  // types anything) so the <input> stays controlled. The backend's
+  // CitizenProfile expects a real int/float or null — sending "" there fails
+  // validation with a 422. Both submit() and the chat box (which sends the
+  // profile so far for context) must go through this before hitting the API.
+  const buildProfilePayload = () => ({
+    ...profile,
+    age: profile.age !== "" && profile.age != null ? Number(profile.age) : null,
+    annual_income:
+      profile.annual_income !== "" && profile.annual_income != null
+        ? Number(profile.annual_income)
+        : null,
+    gender: profile.gender || null,
+    occupation: profile.occupation || null,
+    state: profile.state || null,
+  });
 
   const submit = async (e) => {
     e.preventDefault();
+    setAttemptedSubmit(true);
+    const errs = { ...formatErrors(profile), ...requiredErrors(profile) };
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      return;
+    }
+    setErrors({});
     setLoading(true);
     try {
-      const payload = {
-        ...profile,
-        age: profile.age ? Number(profile.age) : null,
-        annual_income: profile.annual_income ? Number(profile.annual_income) : null,
-        gender: profile.gender || null,
-        occupation: profile.occupation || null,
-        state: profile.state || null,
-      };
-      const res = await checkEligibility(payload);
+      const res = await checkEligibility(buildProfilePayload());
       setResults(res.data);
     } catch (err) {
       console.error(err);
@@ -134,12 +194,21 @@ export default function WelfareCopilot() {
 
   const sendChat = async () => {
     if (!chatInput.trim()) return;
+    // The chat doesn't require a profile at all — but if something in it is
+    // actively malformed (not just blank), don't ship it silently; flag it
+    // the same way the eligibility form does and let the person fix it.
+    const errs = formatErrors(profile);
+    if (Object.keys(errs).length) {
+      setAttemptedSubmit(true);
+      setErrors(errs);
+      return;
+    }
     const msg = chatInput.trim();
     setChatLog((log) => [...log, { role: "user", text: msg }]);
     setChatInput("");
     setChatLoading(true);
     try {
-      const res = await welfareChat(msg, profile);
+      const res = await welfareChat(msg, buildProfilePayload());
       setChatLog((log) => [...log, { role: "assistant", text: res.data.answer }]);
     } catch {
       setChatLog((log) => [...log, { role: "assistant", text: "Sorry, I couldn't reach the server just now." }]);
@@ -147,6 +216,11 @@ export default function WelfareCopilot() {
       setChatLoading(false);
     }
   };
+
+  const fieldClass = (name) =>
+    `mt-1 w-full border rounded px-2 py-1.5 bg-transparent ${
+      errors[name] ? "border-brick ring-1 ring-brick bg-brick/5" : "border-ink/30"
+    }`;
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
@@ -170,12 +244,14 @@ export default function WelfareCopilot() {
 
           <div className="grid grid-cols-2 gap-3">
             <label className="text-sm">
-              Age
+              Age <span className="text-brick">*</span>
               <input
                 type="number" min="0" max="120" value={profile.age}
                 onChange={(e) => set("age", e.target.value)}
-                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+                aria-invalid={Boolean(errors.age)}
+                className={fieldClass("age")}
               />
+              {errors.age && <p className="text-xs text-brick mt-1">{errors.age}</p>}
             </label>
             <label className="text-sm">
               Gender
@@ -210,21 +286,25 @@ export default function WelfareCopilot() {
               type="number" min="0" value={profile.annual_income}
               onChange={(e) => set("annual_income", e.target.value)}
               placeholder="e.g. 180000"
-              className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              aria-invalid={Boolean(errors.annual_income)}
+              className={fieldClass("annual_income")}
             />
+            {errors.annual_income && <p className="text-xs text-brick mt-1">{errors.annual_income}</p>}
           </label>
 
           <label className="text-sm block">
-            State
+            State <span className="text-brick">*</span>
             <select
               value={profile.state} onChange={(e) => set("state", e.target.value)}
-              className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              aria-invalid={Boolean(errors.state)}
+              className={fieldClass("state")}
             >
               <option value="">Select…</option>
               {INDIAN_STATES.map((s) => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
+            {errors.state && <p className="text-xs text-brick mt-1">{errors.state}</p>}
           </label>
 
           <div>
@@ -234,6 +314,12 @@ export default function WelfareCopilot() {
             <TriToggle label="BPL / SECC listed household?" value={profile.bpl_or_seci_listed} onChange={(v) => set("bpl_or_seci_listed", v)} />
             <TriToggle label="Certified disability (80%+)?" value={profile.has_disability} onChange={(v) => set("has_disability", v)} />
           </div>
+
+          {Object.keys(errors).length > 0 && (
+            <p className="text-xs text-brick bg-brick/10 border border-brick/30 rounded px-3 py-2">
+              Please fix the highlighted field{Object.keys(errors).length > 1 ? "s" : ""} above.
+            </p>
+          )}
 
           <button type="submit" disabled={loading} className="btn-primary w-full py-2.5 rounded flex items-center justify-center gap-2">
             {loading ? <Loader2 className="animate-spin" size={16} /> : null}

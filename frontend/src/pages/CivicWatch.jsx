@@ -100,7 +100,7 @@ export default function CivicWatch() {
         Report a problem. Track it. Make sure it gets resolved.
       </h2>
       <p className="text-ink/70 max-w-2xl mb-6">
-        Speak or type your complaint. CivicAI classifies it and routes it to the responsible
+        Speak or type your complaint. IndiCivicAI classifies it and routes it to the responsible
         authority — only they can update its status, but you can always check progress here.
       </p>
 

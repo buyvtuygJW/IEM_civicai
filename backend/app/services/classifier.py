@@ -1,8 +1,9 @@
 """Classifies a free-text civic complaint into a category, assigns the
 responsible authority/department, and estimates a priority level.
 
-Works fully offline via keyword rules; upgrades to Claude automatically when
-ANTHROPIC_API_KEY is configured for higher accuracy on messy/ambiguous text.
+Works fully offline via keyword rules; upgrades to an LLM automatically when
+ANTHROPIC_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY is configured, for higher
+accuracy on messy/ambiguous text.
 """
 from typing import Dict
 from . import ai_client

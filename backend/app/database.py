@@ -4,9 +4,9 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 # Defaults to a local SQLite file, which is perfect for a hackathon demo.
 # For production, set DATABASE_URL to a real database, e.g.:
-#   postgresql://user:password@host:5432/civicai
+#   postgresql://user:password@host:5432/indicivicai
 # No other code changes needed — SQLAlchemy handles the rest.
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./civicai.db")
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./indicivicai.db")
 
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
