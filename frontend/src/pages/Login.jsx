@@ -22,7 +22,7 @@ export default function Login() {
       const res = await loginUser({ email, password });
       login(res.data.access_token, res.data.user);
       const redirectTo = location.state?.from?.pathname ||
-        (res.data.user.role === "government" ? "/dashboard" : "/civicwatch");
+        (res.data.user.role === "government" ? "/admin/complaints" : "/civicwatch");
       navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.detail || "Couldn't log in. Please try again.");
@@ -86,12 +86,6 @@ export default function Login() {
 
       <p className="text-center text-sm text-ink/70 mt-6">
         Don't have an account? <Link to="/register" className="text-gold underline">Register here</Link>
-      </p>
-      <p className="text-center text-xs text-slate2 mt-2">
-        New government employee?{" "}
-        <Link to="/register?role=government" className="text-green-700 underline font-medium">
-          Register your official account →
-        </Link>
       </p>
     </div>
   );

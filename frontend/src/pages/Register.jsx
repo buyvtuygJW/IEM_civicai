@@ -1,30 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { registerUser } from "../api";
 import { useAuth } from "../context/AuthContext";
 import ChakraIcon from "../components/ChakraIcon";
 
-// Kept in sync with the departments CivicWatch routes complaints to
-// (see backend/app/services/classifier.py) so a government account's
-// department lines up with the complaints they'll actually need to act on.
-const DEPARTMENTS = [
-  "Electricity Department",
-  "Water Board",
-  "Sanitation Department",
-  "Municipal Sanitation Department",
-  "Public Works Department (PWD)",
-  "Town Planning Department",
-  "Animal Control Department",
-  "Pollution Control Board",
-  "Traffic Police Department",
-  "Welfare & Social Justice Department",
-  "General Municipal Office",
-];
-
 export default function Register() {
-  const [searchParams] = useSearchParams();
-  const [role, setRole] = useState(searchParams.get("role") === "government" ? "government" : "citizen");
+  const [role, setRole] = useState("citizen");
   const [form, setForm] = useState({
     name: "", email: "", password: "", phone: "", department: "", government_code: "",
   });
@@ -42,7 +24,7 @@ export default function Register() {
     try {
       const res = await registerUser({ ...form, role });
       login(res.data.access_token, res.data.user);
-      navigate(role === "government" ? "/dashboard" : "/civicwatch", { replace: true });
+      navigate(role === "government" ? "/admin/complaints" : "/civicwatch", { replace: true });
     } catch (err) {
       setError(err.response?.data?.detail || "Couldn't create your account. Please try again.");
     } finally {
@@ -108,15 +90,9 @@ export default function Register() {
           <>
             <label className="text-sm block">
               Department
-              <select
-                required value={form.department} onChange={(e) => set("department", e.target.value)}
-                className="mt-1 w-full border border-ink/30 rounded px-3 py-2 bg-transparent"
-              >
-                <option value="">Select your department…</option>
-                {DEPARTMENTS.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
+              <input required value={form.department} onChange={(e) => set("department", e.target.value)}
+                placeholder="e.g. Electricity Department"
+                className="mt-1 w-full border border-ink/30 rounded px-3 py-2 bg-transparent" />
             </label>
             <label className="text-sm block">
               Government registration code

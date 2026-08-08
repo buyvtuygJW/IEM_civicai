@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from .. import schemas, models
 from ..database import get_db
-from ..services import classifier, escalation, geocoding
+from ..services import classifier, escalation, geocoding, place_resolver
 from ..services.auth import get_current_user_optional, require_role
 
 router = APIRouter(prefix="/api/complaints", tags=["complaints"])
@@ -34,14 +34,21 @@ def _serialize(c: models.Complaint) -> dict:
     }
 
 
-def _resolve_area(payload_area: Optional[str], classified_area: Optional[str],
+def _resolve_area(payload_area: Optional[str], raw_text: str,
                    lat: Optional[float], lng: Optional[float]) -> str:
-    """Picks the best available area name: whatever the citizen/voice parser
-    gave us, falling back to reverse-geocoding GPS coordinates, falling back
-    to 'Unspecified' only if we truly have nothing to go on."""
-    area = (payload_area or classified_area or "").strip()
-    if area:
-        return area
+    """Picks the best available area name and canonicalizes it through the
+    shared India gazetteer so complaints group consistently (e.g. "bengaluru",
+    "Bangalore" and "blr" all become "Bengaluru, Karnataka").
+
+    Order: an explicit area (typed or from the voice parser) → a place named in
+    the complaint text itself → reverse-geocoded GPS coordinates → 'Unspecified'.
+    A non-empty area we can't recognise is kept verbatim rather than dropped."""
+    candidate = (payload_area or "").strip()
+    resolved = place_resolver.resolve(candidate) if candidate else place_resolver.extract_from_text(raw_text)
+    if resolved:
+        return resolved["display"]
+    if candidate:
+        return candidate
     if lat is not None and lng is not None:
         geocoded = geocoding.reverse_geocode(lat, lng)
         if geocoded:
@@ -62,7 +69,7 @@ def create_complaint(
     classified = classifier.classify_complaint(raw_text)
     description_en = classified.get("description_en", raw_text)
 
-    area = _resolve_area(payload.area, classified.get("area"), payload.latitude, payload.longitude)
+    area = _resolve_area(payload.area, raw_text, payload.latitude, payload.longitude)
 
     complaint = models.Complaint(
         citizen_id=current_user.id if current_user and current_user.role == "citizen" else None,

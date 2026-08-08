@@ -1,12 +1,9 @@
-from collections import Counter
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from .. import schemas, models
 from ..database import get_db
-from ..services import eligibility_engine, ai_client
-from ..services.auth import require_role
+from ..services import eligibility_engine, ai_client, place_resolver
 
 router = APIRouter(prefix="/api/welfare", tags=["welfare"])
 
@@ -16,20 +13,32 @@ def list_schemes():
     return eligibility_engine.all_schemes()
 
 
+@router.get("/states")
+def list_states():
+    """All 28 states + 8 union territories, for a profile dropdown. Each entry
+    is {code, name, capital, type} where type is 'state' or 'ut'."""
+    return place_resolver.list_states()
+
+
 @router.post("/eligibility", response_model=schemas.EligibilityResponse)
 def check_eligibility(profile: schemas.CitizenProfile, db: Session = Depends(get_db)):
-    result = eligibility_engine.evaluate_schemes(profile.model_dump())
+    # Canonicalize the state once ("orissa"/"WB"/"dilli" -> official name) so
+    # eligibility checks and dashboard analytics both group consistently.
+    profile_data = profile.model_dump()
+    profile_data["state"] = place_resolver.normalize_state(profile_data.get("state"))
+
+    result = eligibility_engine.evaluate_schemes(profile_data)
 
     # log for the dashboard's "scheme adoption / interest" analytics
     for scheme in result["eligible"]:
         db.add(models.EligibilityCheck(
             scheme_id=scheme["id"], scheme_name=scheme["name"],
-            matched=True, state=profile.state,
+            matched=True, state=profile_data["state"],
         ))
     for scheme in result["almost_eligible"]:
         db.add(models.EligibilityCheck(
             scheme_id=scheme["id"], scheme_name=scheme["name"],
-            matched=False, state=profile.state,
+            matched=False, state=profile_data["state"],
         ))
     db.commit()
 
@@ -65,44 +74,7 @@ def welfare_chat(payload: schemas.ChatMessage):
             "I can help you check eligibility for schemes like PM-KISAN, Ayushman Bharat, "
             "PMAY, and more. Try filling in your profile (age, income, occupation, state) "
             "and I'll show you exactly what you qualify for and which documents to prepare. "
-            "(Connect an ANTHROPIC_API_KEY for free-form Q&A.)"
+            "(Set an ANTHROPIC_API_KEY or OPENAI_API_KEY for free-form Q&A.)"
         )
 
     return {"answer": answer}
-
-
-@router.get("/admin/overview")
-def welfare_admin_overview(
-    db: Session = Depends(get_db),
-    _gov: models.User = Depends(require_role("government")),
-):
-    """Government-only welfare analytics — kept separate from the complaint
-    dashboard so each console page has a single, focused job."""
-    checks = db.query(models.EligibilityCheck).all()
-    scheme_counter = Counter(c.scheme_name for c in checks if c.matched)
-    state_counter = Counter(c.state for c in checks if c.state)
-
-    schemes_with_stats = [
-        {
-            "id": s["id"],
-            "name": s["name"],
-            "category": s["category"],
-            "benefit": s["benefit"],
-            "interested_citizens": scheme_counter.get(s["name"], 0),
-        }
-        for s in eligibility_engine.all_schemes()
-    ]
-    schemes_with_stats.sort(key=lambda s: -s["interested_citizens"])
-
-    return {
-        "total_eligibility_checks": len(checks),
-        "scheme_adoption": [
-            {"scheme": name, "interested_citizens": count}
-            for name, count in scheme_counter.most_common(8)
-        ],
-        "state_breakdown": [
-            {"state": state, "count": count}
-            for state, count in state_counter.most_common(8)
-        ],
-        "schemes": schemes_with_stats,
-    }

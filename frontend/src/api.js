@@ -36,7 +36,4 @@ export const parseVoice = (transcript, language) =>
 // ---- Dashboard ----
 export const dashboardSummary = () => api.get("/dashboard/summary"); // government only
 
-// ---- Welfare admin (government only) ----
-export const welfareAdminOverview = () => api.get("/welfare/admin/overview");
-
 export default api;

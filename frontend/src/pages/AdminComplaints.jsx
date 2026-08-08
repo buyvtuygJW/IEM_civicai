@@ -59,7 +59,7 @@ export default function AdminComplaints() {
         <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shrink-0">
           <ClipboardList className="text-white" size={18} />
         </div>
-        <p className="eyebrow">Complaints Reported</p>
+        <p className="eyebrow">Government Console · Complaint Management</p>
       </div>
       <h2 className="font-display text-3xl font-bold text-ink mb-2">
         All reported complaints

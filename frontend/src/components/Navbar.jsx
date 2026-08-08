@@ -9,18 +9,15 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const links =
-    user?.role === "government"
-      ? [
-          { to: "/dashboard", label: "Dashboard" },
-          { to: "/admin/complaints", label: "Complaints Reported" },
-          { to: "/admin/welfare", label: "Welfare" },
-        ]
-      : [
-          { to: "/", label: "Home" },
-          { to: "/welfare", label: "Welfare Copilot" },
-          { to: "/civicwatch", label: "CivicWatch" },
-        ];
+  const links = [
+    { to: "/", label: "Home" },
+    { to: "/welfare", label: "Welfare Copilot" },
+    { to: "/civicwatch", label: "CivicWatch" },
+  ];
+  if (user?.role === "government") {
+    links.push({ to: "/admin/complaints", label: "Manage Complaints" });
+    links.push({ to: "/dashboard", label: "Dashboard" });
+  }
 
   const handleLogout = () => {
     logout();

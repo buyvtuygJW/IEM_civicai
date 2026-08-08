@@ -8,7 +8,7 @@ and get back a structured, ready-to-submit complaint.
 """
 import re
 from typing import Dict
-from . import ai_client, classifier
+from . import ai_client, classifier, place_resolver
 
 HINGLISH_TRANSLATIONS = {
     "kharab hai": "is not working",
@@ -54,14 +54,33 @@ def _extract_area(text: str) -> str:
     return ""
 
 
+def _enrich_area(result: Dict, transcript: str) -> Dict:
+    """Run the extracted area through the shared gazetteer so both the AI and
+    the rule-based paths produce the SAME canonical "City, State" locality.
+
+    If an area was extracted, resolve it; otherwise try to find a place named
+    anywhere in the transcript. A non-empty but unrecognised area is kept as-is
+    (a real-but-obscure locality shouldn't disappear just because it isn't in
+    the gazetteer)."""
+    raw_area = (result.get("area") or "").strip()
+    resolved = place_resolver.resolve(raw_area) if raw_area else place_resolver.extract_from_text(transcript)
+    if resolved:
+        result["area"] = resolved["display"]
+        result["state"] = resolved["state"]
+        result["area_confidence"] = resolved["confidence"]
+    else:
+        result["area"] = raw_area
+        result.setdefault("state", None)
+        result.setdefault("area_confidence", None)
+    return result
+
+
 def parse_voice_complaint(transcript: str, language: str = "en") -> Dict:
     ai_result = ai_client.ask_json(
         system_prompt=(
-            "You convert a citizen's spoken civic complaint into a structured JSON object for a "
-            "municipal complaint system. The transcript may be in English or any major Indian "
-            "language — Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, or "
-            "Punjabi — in native script or Latin transliteration, and since it's transcribed from "
-            "speech it may be informal or slightly garbled. Respond with ONLY JSON: "
+            "You convert a citizen's spoken civic complaint (English, Hindi, or Hinglish, "
+            "transcribed from speech so it may be informal or slightly garbled) into a "
+            "structured JSON object for a municipal complaint system. Respond with ONLY JSON: "
             "{ \"description_en\": clean one-sentence English description, "
             "\"category\": one of [streetlight, water_supply, drainage, garbage, road_pothole, "
             "electricity, illegal_construction, stray_animals, noise_pollution, traffic, general], "
@@ -73,14 +92,14 @@ def parse_voice_complaint(transcript: str, language: str = "en") -> Dict:
     )
     if ai_result and "description_en" in ai_result:
         ai_result.setdefault("area", "")
-        return ai_result
+        return _enrich_area(ai_result, transcript)
 
     # Offline fallback
     classified = classifier.classify_complaint(transcript)
-    return {
+    return _enrich_area({
         "description_en": _rough_translate(transcript),
         "category": classified["category"],
         "department": classified["department"],
         "priority": classified["priority"],
         "area": _extract_area(transcript),
-    }
+    }, transcript)

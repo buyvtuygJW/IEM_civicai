@@ -1,183 +1,144 @@
 # CivicAI
 
-Your AI-powered gateway to government services and local governance.
+An AI-powered gateway to government services and local governance for India:
+file & track civic complaints (by voice or text, in multiple Indian languages),
+auto-route them to the right department, and check welfare-scheme eligibility
+with a Welfare Copilot.
 
-Built for IEMHACKS 4.0. Two completely separate sides:
+- **Backend:** FastAPI + SQLAlchemy (SQLite by default)
+- **Frontend:** React + Vite
+- **AI:** bring your own **Anthropic** *or* **OpenAI** key — or run fully offline
 
-- **Citizens** get Home, Welfare Copilot, and CivicWatch — check eligibility, file complaints
-  (by voice, in 9 languages, or text), and track their own complaint history. Nothing else.
-- **Government accounts** get a focused console — Dashboard, Complaints Reported, and Welfare —
-  with zero access to the citizen-facing pages. Only they can mark a complaint in-progress or
-  resolved.
+---
 
-## Modules
+## 🔑 First: add your own AI key (recommended)
 
-1. **🪪 Welfare Copilot** — a wide eligibility questionnaire (personal, logical, and academic
-   questions — category, marital status, residence, family size, education, student status,
-   maternity status, bank account) matched against **17 schemes spanning every age group**,
-   from infant nutrition support to senior citizen pensions. Open to everyone, no login required.
-2. **📍 CivicWatch** — voice (9 Indian languages) or text complaint intake → AI classification →
-   authority assignment → status tracking. Citizens can file as a guest or logged in; logged-in
-   citizens get a "my complaints" view.
-3. **🖥️ Government Console** — three focused sections:
-   - **Dashboard** — complaint hotspots, category mix, resolution/volume trends, priority
-     breakdown. Complaint operations only.
-   - **Complaints Reported** — the full complaint list with status-update controls.
-   - **Welfare** — scheme adoption analytics, eligibility checks by state, and the full scheme
-     catalog. Kept separate from the Dashboard so welfare and complaint data don't compete for
-     the same screen.
-4. **🎙️ Voice + Regional Language** — say *"Mere area mein street light kharab hai"* (or the
-   same in Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, or Punjabi) and
-   CivicWatch turns it into a structured, routed, geolocated complaint automatically.
+CivicAI runs **offline** on rule-based logic with no key at all — nothing will
+crash. But complaint classification, multilingual voice parsing, and the Welfare
+Copilot chat are **noticeably better with an LLM**, so the recommended first
+step is to plug in **your own key**.
 
-## Accounts & roles
+1. Copy the example env file:
+   ```bash
+   cp .env.example .env          # for Docker (repo root)
+   # or, when running the backend directly:
+   cp backend/.env.example backend/.env
+   ```
+2. Open `.env` and set **one** of these to your own key:
+   ```ini
+   ANTHROPIC_API_KEY=sk-ant-...   # uses Claude   (takes priority if both set)
+   OPENAI_API_KEY=sk-...          # uses OpenAI
+   # optional: pin a model. Defaults: claude-sonnet-5 / gpt-4o-mini
+   AI_MODEL=
+   ```
 
-Every account is either a **citizen** or a **government** account:
+> The key is read **only** from the environment — it is never hardcoded or
+> committed. `.env` (and the local `civicai.db`) are gitignored. Confirm the app
+> picked it up at `GET /api/health` → `{"ai": {"enabled": true, "provider": ...}}`.
 
-- Citizens register freely and can file/track complaints and check eligibility. Visiting a
-  government-only URL redirects them to `/`.
-- Government accounts pick their **department from a predefined list** (kept in sync with the
-  departments CivicWatch routes complaints to) and need a registration code
-  (`GOV_REGISTRATION_CODE` env var, defaults to `CIVIC-GOV-2026`) — in a real deployment this
-  would be tied to an actual department directory/SSO instead of a shared secret. Visiting a
-  citizen-facing URL (`/`, `/welfare`, `/civicwatch`) redirects them straight to `/dashboard` —
-  the government console never doubles as a citizen site.
-- Only government accounts can call the endpoints that list all complaints, change a complaint's
-  status, view the operations dashboard, or view welfare analytics — enforced server-side with
-  JWT auth (`GET /api/complaints`, `PATCH /api/complaints/{id}/status`,
-  `GET /api/dashboard/summary`, `GET /api/welfare/admin/overview`).
+If you leave both keys blank, everything still works — the app transparently
+falls back to keyword/rule-based logic.
 
-A direct "Register your official account" link is available from the Login page, the Welfare
-Copilot page, and the Home page's Government Console card — all pointing to
-`/register?role=government`, which preselects the government signup tab.
+---
 
-Demo accounts (seeded automatically): `citizen@demo.in` / `official@demo.in`, both with password
-`demo1234`.
+## Quick start
 
-## Architecture
-
-```
-civicai/
-├── backend/     FastAPI + SQLite (Python)
-│   ├── app/
-│   │   ├── routers/       auth.py, welfare.py (+ /admin/overview), complaints.py,
-│   │   │                  dashboard.py, voice.py
-│   │   ├── services/      auth.py (JWT/passwords), eligibility_engine.py, classifier.py
-│   │   │                  (9-language keyword rules), voice_parser.py, geocoding.py,
-│   │   │                  escalation.py, ai_client.py
-│   │   ├── models.py      User, Complaint, StatusLog, EligibilityCheck
-│   │   └── main.py        FastAPI app
-│   └── seed_data/schemes.json   17 government schemes with eligibility rules
-└── frontend/    React (Vite) + Tailwind + Recharts
-    └── src/
-        ├── pages/          Home, WelfareCopilot, CivicWatch, AdminComplaints,
-        │                   AdminWelfare, Dashboard, Login, Register
-        ├── components/     Navbar, VoiceInput, Stamp, ChakraIcon,
-        │                   ProtectedRoute, CitizenOnlyRoute
-        └── context/        AuthContext (JWT session handling)
-```
-
-Everything works **fully offline** with rule-based logic (keyword classifiers in 9 languages, a
-scheme-criteria matcher, a lightweight Hinglish gloss for voice transcripts) so the demo never
-breaks without internet access. Set `ANTHROPIC_API_KEY` and the classifier, voice parser, and
-Welfare Copilot chat all silently upgrade to use Claude for much higher accuracy on messy,
-real-world, multilingual phrasing — see `backend/app/services/ai_client.py`.
-
-**A note on the language keyword lists**: `classifier.py`'s offline fallback includes a handful
-of hand-picked keywords per category for Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada,
-Malayalam, and Punjabi (in addition to the more thoroughly-covered Hindi/Hinglish). These cover
-the single most common word for each issue type, not comprehensive vocabulary — treat them as a
-reasonable starting point rather than exhaustively verified translations. Claude, when enabled,
-handles all nine languages far more robustly than any fixed keyword list could.
-
-## The location fix
-
-CivicWatch requests your location automatically as soon as the page loads (no more forgetting to
-click a button before speaking), and the backend reverse-geocodes GPS coordinates (via
-OpenStreetMap's free Nominatim API, no key required) into a real locality name whenever neither
-the spoken transcript nor a typed area gave us one. "Unspecified" is a last resort, not the
-default. This needs outbound internet access to `nominatim.openstreetmap.org` from wherever the
-backend runs.
-
-## Design system
-
-Glass/gradient/light, built around Indian civic identity:
-
-- **Colour**: a soft gradient background (desaturated saffron/indigo/green fields), true
-  Indian-flag saffron (`#FF9933`) and flag green (`#138808`) as sparing accents, an indigo→blue
-  gradient as the primary action colour.
-- **Type**: Poppins for headings, Inter for body text, JetBrains Mono for case numbers/data.
-- **Signature graphic**: a 24-spoke wheel motif (`ChakraIcon.jsx`) used as the logomark and hero
-  visual.
-- **Module colour-coding**: Welfare Copilot is saffron, CivicWatch is indigo, the Government
-  Console is green.
-- Most of this lives in `frontend/src/index.css` as a handful of reusable classes
-  (`.ledger-card` for glass cards, `.btn-primary`/`.btn-secondary`, `.stamp` for status pills).
-
-## Running it with Docker Desktop
+### Option A — Docker (everything at once)
 
 ```bash
-cd civicai
+cp .env.example .env      # add your AI key (see above); optional but recommended
 docker compose up --build
 ```
 
-Builds both images, starts them, seeds demo data automatically. Once you see `VITE ready`:
+- Frontend → http://localhost:5173
+- Backend  → http://localhost:8000  (API docs at `/docs`)
 
-- **App**: http://localhost:5173
-- **API docs**: http://localhost:8000/docs
+### Option B — Run each service directly
 
-To stop: `Ctrl+C`, then `docker compose down`. Demo data persists in `backend/civicai.db` on your
-machine between runs.
-
-**To enable Claude-powered classification/voice-parsing/chat:** copy `.env.example` (repo root)
-to `.env` and add `ANTHROPIC_API_KEY=sk-ant-...`. Compose reads it automatically.
-
-## Running it locally without Docker
-
-### 1. Backend
-
+**Backend**
 ```bash
 cd backend
-python -m venv venv && source venv/bin/activate
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-cp .env.example .env        # optionally add ANTHROPIC_API_KEY / GOV_REGISTRATION_CODE / JWT_SECRET
-python seed_demo_data.py    # populates demo accounts + 60 demo complaints
-uvicorn app.main:app --reload --port 8000
+cp .env.example .env       # add your AI key
+python seed_demo_data.py   # optional: load demo schemes + sample complaints
+uvicorn app.main:app --reload
 ```
 
-### 2. Frontend
-
+**Frontend**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-**Voice input needs a secure context** — `http://localhost` works, but a plain IP address will
-silently block the microphone in most browsers.
+---
 
-## Demo script (for judges)
+## Data & persistence
 
-1. **Home** — colour-coded module pitch, chakra hero graphic.
-2. **Register** as a citizen, then **CivicWatch** — allow location access, pick a language (try
-   Tamil or Bengali), speak a complaint → watch it get classified, geolocated, and filed.
-3. **Welfare Copilot** — fill in a young SC/ST student profile (age 20, category: SC, currently
-   studying: yes, income: ₹1,50,000) → see the Post-Matric Scholarship and other matches. Try an
-   infant profile (age 2) or a senior citizen profile (age 70, BPL) to show the age-group spread.
-4. **Log out, log in as** `official@demo.in` — show the government nav has *only* Dashboard,
-   Complaints Reported, and Welfare. Mark the complaint from step 2 in-progress on Complaints
-   Reported, show the Dashboard's live charts, then show Welfare's scheme-adoption analytics.
-   Try visiting `/civicwatch` while logged in as government — it bounces straight back to the
-   dashboard.
+The database is a **real, on-disk SQLite file** (not in-memory), created at
+`backend/civicai.db` on first boot and seeded by `seed_demo_data.py`. It
+persists across restarts (and across `docker compose down`/`up`, since the
+`backend` folder is bind-mounted). It is gitignored.
 
-## What's still stubbed for the hackathon demo
+To move off SQLite, point `DATABASE_URL` at any SQLAlchemy-supported database —
+no code changes needed:
 
-- **Photos**: accepted but not run through image classification.
-- **Notifications**: escalation is computed on read rather than pushed via SMS/email.
-- **Government onboarding**: a shared registration code is fine for a demo; a real deployment
-  needs department-verified accounts (SSO or admin-approval flow).
-- **Scale**: `DATABASE_URL` is already wired for a drop-in swap to Postgres — no code changes
-  required (see `backend/app/database.py`).
-- **Language coverage**: the offline keyword classifier's non-Hindi language support is a
-  starting point, not exhaustive — accuracy improves substantially with `ANTHROPIC_API_KEY` set.
+```ini
+DATABASE_URL=postgresql://user:password@host:5432/civicai
+```
+
+To reset all data, stop the app and delete `backend/civicai.db`.
+
+---
+
+## How the AI features work (and their offline fallback)
+
+| Feature | With a key | Offline (no key) |
+| --- | --- | --- |
+| Complaint classification | LLM assigns category / department / priority | keyword rules across Indian languages |
+| Voice complaint parsing | LLM cleans & structures the transcript | lightweight Hinglish→English gloss + regex |
+| Welfare Copilot chat | free-form Q&A grounded in the scheme list | helpful canned guidance |
+
+**Speech-to-text is the browser's job, not the server's.** Voice input uses the
+browser's built-in Web Speech API (Chrome/Edge, needs internet); the backend
+only ever receives the finished **text** transcript.
+
+---
+
+## Location resolution (all Indian states + UTs)
+
+Every complaint's area — whether extracted by the LLM or by the rule-based
+parser — is funnelled through a single shared **India gazetteer**
+(`backend/app/services/place_resolver.py`, data in
+`backend/seed_data/india_places.json`). It:
+
+- covers **all 28 states + 8 union territories**, with aliases (including some
+  native-script and colloquial names) and major cities/districts;
+- canonicalizes messy input so `bengaluru`, `Bangalore`, and `blr` all become
+  **`Bengaluru, Karnataka`** — keeping complaint analytics consistent;
+- keeps a genuine but unrecognised locality **verbatim** rather than dropping it;
+- normalizes the welfare profile's state (`orissa` → `Odisha`) and powers an
+  optional `state_in` eligibility criterion for state-specific schemes.
+
+Endpoint: `GET /api/welfare/states` returns the full list (`{code, name,
+capital, type}`) — handy for a profile dropdown.
+
+> Coverage is states/UTs + major cities/districts, not every village. For
+> village/ward-level coverage, load a [GeoNames](https://www.geonames.org/) `IN`
+> dump into the same JSON shape.
+
+---
+
+## Environment variables
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `ANTHROPIC_API_KEY` | *(empty)* | Use Claude. Priority if both keys set. |
+| `OPENAI_API_KEY` | *(empty)* | Use OpenAI. |
+| `AI_MODEL` | `claude-sonnet-5` / `gpt-4o-mini` | Override the model. |
+| `JWT_SECRET` | `dev-secret-change-me-in-production` | Signs login tokens. **Change for real deployments.** |
+| `GOV_REGISTRATION_CODE` | `CIVIC-GOV-2026` | Shared code to register a government account. **Change for real deployments.** |
+| `DATABASE_URL` | `sqlite:///./civicai.db` | Database connection string. |
+
+All are optional for a local demo — safe defaults are baked in.

@@ -4,14 +4,6 @@ import { Mic, MicOff, Loader2, AlertTriangle } from "lucide-react";
 const LANGUAGES = [
   { code: "en-IN", label: "English" },
   { code: "hi-IN", label: "हिंदी (Hindi)" },
-  { code: "bn-IN", label: "বাংলা (Bengali)" },
-  { code: "ta-IN", label: "தமிழ் (Tamil)" },
-  { code: "te-IN", label: "తెలుగు (Telugu)" },
-  { code: "mr-IN", label: "मराठी (Marathi)" },
-  { code: "gu-IN", label: "ગુજરાતી (Gujarati)" },
-  { code: "kn-IN", label: "ಕನ್ನಡ (Kannada)" },
-  { code: "ml-IN", label: "മലയാളം (Malayalam)" },
-  { code: "pa-IN", label: "ਪੰਜਾਬੀ (Punjabi)" },
 ];
 
 // Friendly explanations for the error codes the Web Speech API can raise.
@@ -90,7 +82,7 @@ export default function VoiceInput({ onResult, disabled }) {
         submittingRef.current = true;
         setProcessing(true);
         try {
-          await onResult(finalText, langRef.current.split("-")[0]);
+          await onResult(finalText, langRef.current.startsWith("hi") ? "hi" : "en");
           setTranscript("");
           transcriptRef.current = "";
         } catch {

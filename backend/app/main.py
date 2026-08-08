@@ -33,4 +33,4 @@ app.include_router(voice.router)
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "ai_enabled": ai_client.ai_available()}
+    return {"status": "ok", "ai_enabled": ai_client.ai_available(), "ai": ai_client.active_provider()}

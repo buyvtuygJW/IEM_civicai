@@ -22,13 +22,11 @@ const modules = [
   {
     icon: LayoutDashboard,
     title: "Government Console",
-    desc: "Real-time complaint hotspots, resolution times, pending cases, and welfare scheme analytics — plus the tools to mark cases in progress and resolved.",
+    desc: "Real-time complaint hotspots, resolution times, pending cases, and scheme adoption — plus the tools to mark cases in progress and resolved.",
     to: "/dashboard",
     cta: "Government sign in",
     from: "from-green-500", toColor: "to-emerald-600", ring: "hover:shadow-green-200",
     badge: "Government accounts only",
-    secondaryTo: "/register?role=government",
-    secondaryLabel: "New official? Register here →",
   },
 ];
 
@@ -77,9 +75,10 @@ export default function Home() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        {modules.map(({ icon: Icon, title, desc, to, cta, from, toColor, ring, badge, secondaryTo, secondaryLabel }) => (
-          <div
+        {modules.map(({ icon: Icon, title, desc, to, cta, from, toColor, ring, badge }) => (
+          <Link
             key={title}
+            to={to}
             className={`ledger-card rounded-md p-6 flex flex-col hover:-translate-y-1 transition-transform ${ring}`}
           >
             <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${from} ${toColor} flex items-center justify-center mb-4 shadow-lg`}>
@@ -92,15 +91,10 @@ export default function Home() {
                 {badge}
               </span>
             )}
-            <Link to={to} className="mt-4 text-sm font-semibold text-ink flex items-center gap-1 hover:text-indigo-600">
+            <span className="mt-4 text-sm font-semibold text-ink flex items-center gap-1">
               {cta} <ArrowRight size={14} />
-            </Link>
-            {secondaryTo && (
-              <Link to={secondaryTo} className="mt-1.5 text-xs font-medium text-green-700 hover:underline w-fit">
-                {secondaryLabel}
-              </Link>
-            )}
-          </div>
+            </span>
+          </Link>
         ))}
       </div>
     </div>

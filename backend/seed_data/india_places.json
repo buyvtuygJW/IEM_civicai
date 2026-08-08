@@ -1,0 +1,185 @@
+{
+  "_comment": "All 28 Indian states + 8 union territories, with common aliases (including some native-script and colloquial names) and a set of major cities/districts. This is a curated gazetteer sufficient for locality resolution in a civic app; it is NOT village-level exhaustive. To go deeper (every village/ward), load a GeoNames IN dump into the same shape.",
+  "states": [
+    {
+      "code": "AP", "name": "Andhra Pradesh", "type": "state", "capital": "Amaravati",
+      "aliases": ["andhra pradesh", "andhra", "ap", "आंध्र प्रदेश"],
+      "cities": ["Visakhapatnam", "Vizag", "Vijayawada", "Guntur", "Nellore", "Kurnool", "Rajahmundry", "Tirupati", "Kadapa", "Kakinada", "Anantapur", "Amaravati", "Eluru", "Ongole", "Chittoor"]
+    },
+    {
+      "code": "AR", "name": "Arunachal Pradesh", "type": "state", "capital": "Itanagar",
+      "aliases": ["arunachal pradesh", "arunachal"],
+      "cities": ["Itanagar", "Naharlagun", "Pasighat", "Tawang", "Ziro", "Bomdila"]
+    },
+    {
+      "code": "AS", "name": "Assam", "type": "state", "capital": "Dispur",
+      "aliases": ["assam", "asom", "অসম"],
+      "cities": ["Guwahati", "Dispur", "Silchar", "Dibrugarh", "Jorhat", "Nagaon", "Tinsukia", "Tezpur", "Bongaigaon"]
+    },
+    {
+      "code": "BR", "name": "Bihar", "type": "state", "capital": "Patna",
+      "aliases": ["bihar", "बिहार"],
+      "cities": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur", "Darbhanga", "Purnia", "Ara", "Begusarai", "Katihar", "Chapra", "Bihar Sharif", "Sasaram"]
+    },
+    {
+      "code": "CG", "name": "Chhattisgarh", "type": "state", "capital": "Raipur",
+      "aliases": ["chhattisgarh", "chattisgarh", "cg", "छत्तीसगढ़"],
+      "cities": ["Raipur", "Bhilai", "Bilaspur", "Korba", "Durg", "Rajnandgaon", "Jagdalpur", "Raigarh", "Ambikapur"]
+    },
+    {
+      "code": "GA", "name": "Goa", "type": "state", "capital": "Panaji",
+      "aliases": ["goa", "गोवा"],
+      "cities": ["Panaji", "Panjim", "Margao", "Vasco da Gama", "Mapusa", "Ponda", "Calangute"]
+    },
+    {
+      "code": "GJ", "name": "Gujarat", "type": "state", "capital": "Gandhinagar",
+      "aliases": ["gujarat", "ગુજરાત"],
+      "cities": ["Ahmedabad", "Surat", "Vadodara", "Baroda", "Rajkot", "Bhavnagar", "Jamnagar", "Gandhinagar", "Junagadh", "Anand", "Nadiad", "Bharuch", "Gandhidham", "Morbi"]
+    },
+    {
+      "code": "HR", "name": "Haryana", "type": "state", "capital": "Chandigarh",
+      "aliases": ["haryana", "हरियाणा"],
+      "cities": ["Faridabad", "Gurugram", "Gurgaon", "Panipat", "Ambala", "Yamunanagar", "Rohtak", "Hisar", "Karnal", "Sonipat", "Panchkula", "Bhiwani", "Sirsa"]
+    },
+    {
+      "code": "HP", "name": "Himachal Pradesh", "type": "state", "capital": "Shimla",
+      "aliases": ["himachal pradesh", "himachal", "hp", "हिमाचल प्रदेश"],
+      "cities": ["Shimla", "Dharamshala", "Solan", "Mandi", "Kullu", "Manali", "Hamirpur", "Una", "Nahan", "Palampur"]
+    },
+    {
+      "code": "JH", "name": "Jharkhand", "type": "state", "capital": "Ranchi",
+      "aliases": ["jharkhand", "झारखंड"],
+      "cities": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Deoghar", "Hazaribagh", "Giridih", "Ramgarh", "Phusro"]
+    },
+    {
+      "code": "KA", "name": "Karnataka", "type": "state", "capital": "Bengaluru",
+      "aliases": ["karnataka", "ಕರ್ನಾಟಕ"],
+      "cities": ["Bengaluru", "Bangalore", "Mysuru", "Mysore", "Hubli", "Dharwad", "Mangaluru", "Mangalore", "Belagavi", "Belgaum", "Kalaburagi", "Gulbarga", "Ballari", "Bellary", "Davanagere", "Shivamogga", "Shimoga", "Tumakuru", "Tumkur", "Udupi", "Hospet"]
+    },
+    {
+      "code": "KL", "name": "Kerala", "type": "state", "capital": "Thiruvananthapuram",
+      "aliases": ["kerala", "കേരളം"],
+      "cities": ["Thiruvananthapuram", "Trivandrum", "Kochi", "Cochin", "Ernakulam", "Kozhikode", "Calicut", "Thrissur", "Kollam", "Kannur", "Alappuzha", "Alleppey", "Palakkad", "Malappuram", "Kottayam"]
+    },
+    {
+      "code": "MP", "name": "Madhya Pradesh", "type": "state", "capital": "Bhopal",
+      "aliases": ["madhya pradesh", "mp", "मध्य प्रदेश"],
+      "cities": ["Bhopal", "Indore", "Jabalpur", "Gwalior", "Ujjain", "Sagar", "Ratlam", "Rewa", "Satna", "Dewas", "Khandwa", "Chhindwara", "Vidisha"]
+    },
+    {
+      "code": "MH", "name": "Maharashtra", "type": "state", "capital": "Mumbai",
+      "aliases": ["maharashtra", "महाराष्ट्र"],
+      "cities": ["Mumbai", "Bombay", "Pune", "Nagpur", "Nashik", "Aurangabad", "Chhatrapati Sambhajinagar", "Thane", "Navi Mumbai", "Solapur", "Kolhapur", "Amravati", "Nanded", "Sangli", "Jalgaon", "Akola", "Latur", "Ahmednagar", "Chandrapur"]
+    },
+    {
+      "code": "MN", "name": "Manipur", "type": "state", "capital": "Imphal",
+      "aliases": ["manipur"],
+      "cities": ["Imphal", "Thoubal", "Bishnupur", "Churachandpur", "Kakching"]
+    },
+    {
+      "code": "ML", "name": "Meghalaya", "type": "state", "capital": "Shillong",
+      "aliases": ["meghalaya"],
+      "cities": ["Shillong", "Tura", "Jowai", "Nongstoin", "Baghmara"]
+    },
+    {
+      "code": "MZ", "name": "Mizoram", "type": "state", "capital": "Aizawl",
+      "aliases": ["mizoram"],
+      "cities": ["Aizawl", "Lunglei", "Champhai", "Serchhip", "Kolasib"]
+    },
+    {
+      "code": "NL", "name": "Nagaland", "type": "state", "capital": "Kohima",
+      "aliases": ["nagaland"],
+      "cities": ["Kohima", "Dimapur", "Mokokchung", "Tuensang", "Wokha"]
+    },
+    {
+      "code": "OD", "name": "Odisha", "type": "state", "capital": "Bhubaneswar",
+      "aliases": ["odisha", "orissa", "ଓଡ଼ିଶା"],
+      "cities": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur", "Puri", "Balasore", "Baleswar", "Bhadrak", "Baripada"]
+    },
+    {
+      "code": "PB", "name": "Punjab", "type": "state", "capital": "Chandigarh",
+      "aliases": ["punjab", "ਪੰਜਾਬ", "पंजाब"],
+      "cities": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda", "Mohali", "Hoshiarpur", "Pathankot", "Moga", "Firozpur", "Batala"]
+    },
+    {
+      "code": "RJ", "name": "Rajasthan", "type": "state", "capital": "Jaipur",
+      "aliases": ["rajasthan", "राजस्थान"],
+      "cities": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Ajmer", "Bikaner", "Bhilwara", "Alwar", "Sikar", "Sri Ganganagar", "Pali", "Bharatpur"]
+    },
+    {
+      "code": "SK", "name": "Sikkim", "type": "state", "capital": "Gangtok",
+      "aliases": ["sikkim"],
+      "cities": ["Gangtok", "Namchi", "Gyalshing", "Mangan", "Rangpo"]
+    },
+    {
+      "code": "TN", "name": "Tamil Nadu", "type": "state", "capital": "Chennai",
+      "aliases": ["tamil nadu", "tamilnadu", "tn", "தமிழ்நாடு"],
+      "cities": ["Chennai", "Madras", "Coimbatore", "Madurai", "Tiruchirappalli", "Trichy", "Salem", "Tirunelveli", "Tiruppur", "Vellore", "Erode", "Thoothukudi", "Tuticorin", "Thanjavur", "Dindigul", "Kanchipuram"]
+    },
+    {
+      "code": "TS", "name": "Telangana", "type": "state", "capital": "Hyderabad",
+      "aliases": ["telangana", "తెలంగాణ", "ts"],
+      "cities": ["Hyderabad", "Secunderabad", "Warangal", "Nizamabad", "Karimnagar", "Khammam", "Ramagundam", "Mahbubnagar", "Nalgonda"]
+    },
+    {
+      "code": "TR", "name": "Tripura", "type": "state", "capital": "Agartala",
+      "aliases": ["tripura"],
+      "cities": ["Agartala", "Udaipur Tripura", "Dharmanagar", "Kailashahar", "Belonia"]
+    },
+    {
+      "code": "UP", "name": "Uttar Pradesh", "type": "state", "capital": "Lucknow",
+      "aliases": ["uttar pradesh", "up", "उत्तर प्रदेश"],
+      "cities": ["Lucknow", "Kanpur", "Ghaziabad", "Agra", "Varanasi", "Banaras", "Meerut", "Prayagraj", "Allahabad", "Bareilly", "Aligarh", "Moradabad", "Noida", "Greater Noida", "Gorakhpur", "Firozabad", "Jhansi", "Mathura", "Ayodhya", "Saharanpur"]
+    },
+    {
+      "code": "UK", "name": "Uttarakhand", "type": "state", "capital": "Dehradun",
+      "aliases": ["uttarakhand", "uttaranchal", "uk"],
+      "cities": ["Dehradun", "Haridwar", "Roorkee", "Haldwani", "Rudrapur", "Nainital", "Rishikesh", "Kashipur", "Kotdwar"]
+    },
+    {
+      "code": "WB", "name": "West Bengal", "type": "state", "capital": "Kolkata",
+      "aliases": ["west bengal", "bengal", "wb", "paschim banga", "পশ্চিমবঙ্গ", "बंगाल"],
+      "cities": ["Kolkata", "Calcutta", "Howrah", "Durgapur", "Asansol", "Siliguri", "Darjeeling", "Malda", "Kharagpur", "Haldia", "Bardhaman", "Burdwan", "Barasat", "Baharampur"]
+    },
+    {
+      "code": "AN", "name": "Andaman and Nicobar Islands", "type": "ut", "capital": "Port Blair",
+      "aliases": ["andaman and nicobar islands", "andaman and nicobar", "andaman", "a&n islands", "andaman & nicobar"],
+      "cities": ["Port Blair", "Diglipur"]
+    },
+    {
+      "code": "CH", "name": "Chandigarh", "type": "ut", "capital": "Chandigarh",
+      "aliases": ["chandigarh", "चंडीगढ़"],
+      "cities": ["Chandigarh"]
+    },
+    {
+      "code": "DN", "name": "Dadra and Nagar Haveli and Daman and Diu", "type": "ut", "capital": "Daman",
+      "aliases": ["dadra and nagar haveli and daman and diu", "daman and diu", "dadra and nagar haveli", "dnh", "daman & diu"],
+      "cities": ["Daman", "Diu", "Silvassa"]
+    },
+    {
+      "code": "DL", "name": "Delhi", "type": "ut", "capital": "New Delhi",
+      "aliases": ["delhi", "new delhi", "nct of delhi", "national capital territory of delhi", "nct", "dilli", "दिल्ली", "delhi ncr", "ncr"],
+      "cities": ["New Delhi", "Delhi", "Rohini", "Dwarka", "Saket", "Karol Bagh", "Connaught Place", "Pitampura", "Shahdara", "Najafgarh", "Janakpuri", "Laxmi Nagar", "Chandni Chowk", "Vasant Kunj", "Okhla"]
+    },
+    {
+      "code": "JK", "name": "Jammu and Kashmir", "type": "ut", "capital": "Srinagar",
+      "aliases": ["jammu and kashmir", "j&k", "jk", "jammu & kashmir", "kashmir", "jammu"],
+      "cities": ["Srinagar", "Jammu", "Anantnag", "Baramulla", "Sopore", "Udhampur", "Kathua"]
+    },
+    {
+      "code": "LA", "name": "Ladakh", "type": "ut", "capital": "Leh",
+      "aliases": ["ladakh"],
+      "cities": ["Leh", "Kargil"]
+    },
+    {
+      "code": "LD", "name": "Lakshadweep", "type": "ut", "capital": "Kavaratti",
+      "aliases": ["lakshadweep"],
+      "cities": ["Kavaratti", "Agatti", "Minicoy"]
+    },
+    {
+      "code": "PY", "name": "Puducherry", "type": "ut", "capital": "Puducherry",
+      "aliases": ["puducherry", "pondicherry", "pondy", "पुडुचेरी"],
+      "cities": ["Puducherry", "Pondicherry", "Karaikal", "Yanam", "Mahe", "Oulgaret"]
+    }
+  ]
+}
