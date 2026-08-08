@@ -6,6 +6,7 @@
 .env.*
 !.env.example
 *.env
+devnote
 
 # ─────────────────────────────────────────────────────────────
 # Databases (local SQLite + write-ahead/journal side files)
