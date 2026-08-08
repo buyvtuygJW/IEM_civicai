@@ -45,6 +45,15 @@ class CitizenProfile(BaseModel):
     has_girl_child_under_10: Optional[bool] = None
     bpl_or_seci_listed: Optional[bool] = None
     has_disability: Optional[bool] = None
+    # Personal / logical / academic questions, added to widen scheme matching
+    category: Optional[str] = None  # General, OBC, SC, ST
+    marital_status: Optional[str] = None
+    residence_type: Optional[str] = None  # urban, rural
+    family_members: Optional[int] = None
+    education_level: Optional[str] = None
+    currently_studying: Optional[bool] = None
+    is_pregnant_or_lactating: Optional[bool] = None
+    has_bank_account: Optional[bool] = None
 
 
 class SchemeResult(BaseModel):

@@ -1,22 +1,36 @@
-import { useState } from "react";
-import { CheckCircle2, CircleDashed, FileText, Send, Loader2, HandCoins } from "lucide-react";
-import { checkEligibility, welfareChat } from "../api";
+import { useEffect, useState } from "react";
+import { CheckCircle2, CircleDashed, FileText, Send, Loader2, HandCoins, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+import { checkEligibility, welfareChat, listStates } from "../api";
 
 const OCCUPATIONS = [
   "Farmer", "Student", "Self-employed", "Small business owner", "Street vendor",
   "Salaried employee", "Homemaker", "Unemployed", "Retired",
 ];
 
-const INDIAN_STATES = [
+// Fallback used only if the /welfare/states API call fails — the real list
+// (all 28 states + 8 UTs, gazetteer-normalized) is fetched at mount.
+const FALLBACK_STATES = [
   "Andhra Pradesh", "Bihar", "Delhi", "Gujarat", "Karnataka", "Kerala",
   "Madhya Pradesh", "Maharashtra", "Rajasthan", "Tamil Nadu", "Telangana",
   "Uttar Pradesh", "West Bengal", "Other",
+];
+
+const CATEGORIES = ["General", "OBC", "SC", "ST"];
+const MARITAL_STATUSES = ["Single", "Married", "Widowed", "Divorced"];
+const EDUCATION_LEVELS = [
+  "No formal education", "Below 10th", "10th passed", "12th passed", "Graduate", "Postgraduate",
 ];
 
 const emptyProfile = {
   age: "", gender: "", occupation: "", annual_income: "", state: "",
   owns_land: null, owns_pucca_house: null, has_girl_child_under_10: null,
   bpl_or_seci_listed: null, has_disability: null,
+  // Personal / logical / academic questions — the more we know, the more
+  // schemes (student, maternity, senior, category-based) we can match.
+  category: "", marital_status: "", residence_type: "", family_members: "",
+  education_level: "", currently_studying: null, is_pregnant_or_lactating: null,
+  has_bank_account: null,
 };
 
 function TriToggle({ label, value, onChange }) {
@@ -118,6 +132,12 @@ function formatErrors(p) {
       errs.annual_income = "Enter a valid, non-negative amount.";
     }
   }
+  if (p.family_members !== "" && p.family_members != null) {
+    const n = Number(p.family_members);
+    if (!Number.isInteger(n) || n < 1 || n > 30) {
+      errs.family_members = "Enter a whole number between 1 and 30.";
+    }
+  }
   return errs;
 }
 
@@ -137,6 +157,18 @@ export default function WelfareCopilot() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [states, setStates] = useState(FALLBACK_STATES.map((name) => ({ name })));
+
+  useEffect(() => {
+    listStates()
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length) setStates(res.data);
+      })
+      .catch(() => {
+        // Fine to stay on the fallback list — the eligibility check still
+        // works, it just has fewer states to choose from.
+      });
+  }, []);
   // Format errors (garbled/out-of-range values) are flagged live from the
   // first keystroke — that's never okay regardless of whether the person has
   // tried to submit yet. Required-field nagging ("Age is required") only
@@ -167,9 +199,17 @@ export default function WelfareCopilot() {
       profile.annual_income !== "" && profile.annual_income != null
         ? Number(profile.annual_income)
         : null,
+    family_members:
+      profile.family_members !== "" && profile.family_members != null
+        ? Number(profile.family_members)
+        : null,
     gender: profile.gender || null,
     occupation: profile.occupation || null,
     state: profile.state || null,
+    category: profile.category || null,
+    marital_status: profile.marital_status || null,
+    residence_type: profile.residence_type || null,
+    education_level: profile.education_level || null,
   });
 
   const submit = async (e) => {
@@ -233,10 +273,17 @@ export default function WelfareCopilot() {
       <h2 className="font-display text-3xl font-bold text-ink mb-2">
         What government benefits am I eligible for?
       </h2>
-      <p className="text-ink/70 max-w-2xl mb-8">
+      <p className="text-ink/70 max-w-2xl mb-3">
         Fill in as much as you're comfortable sharing — nothing is stored beyond this session
         except an anonymous count used for the government dashboard's scheme-adoption stats.
+        The more questions you answer, the more schemes we can accurately match you to.
       </p>
+      <Link
+        to="/register?role=government"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-green-700 hover:underline mb-8"
+      >
+        <ShieldCheck size={13} /> Work for the government? Register for the official console here →
+      </Link>
 
       <div className="grid lg:grid-cols-5 gap-8">
         <form onSubmit={submit} className="lg:col-span-2 ledger-card rounded-md p-6 space-y-4 h-fit">
@@ -300,11 +347,72 @@ export default function WelfareCopilot() {
               className={fieldClass("state")}
             >
               <option value="">Select…</option>
-              {INDIAN_STATES.map((s) => (
-                <option key={s} value={s}>{s}</option>
+              {states.map((s) => (
+                <option key={s.code || s.name} value={s.name}>{s.name}</option>
               ))}
             </select>
             {errors.state && <p className="text-xs text-brick mt-1">{errors.state}</p>}
+          </label>
+
+          <p className="eyebrow pt-2">A bit more about you</p>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-sm">
+              Category
+              <select
+                value={profile.category} onChange={(e) => set("category", e.target.value)}
+                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              >
+                <option value="">Prefer not to say</option>
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </label>
+            <label className="text-sm">
+              Marital status
+              <select
+                value={profile.marital_status} onChange={(e) => set("marital_status", e.target.value)}
+                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              >
+                <option value="">Prefer not to say</option>
+                {MARITAL_STATUSES.map((m) => <option key={m} value={m.toLowerCase()}>{m}</option>)}
+              </select>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="text-sm">
+              Residence
+              <select
+                value={profile.residence_type} onChange={(e) => set("residence_type", e.target.value)}
+                className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+              >
+                <option value="">Prefer not to say</option>
+                <option value="urban">Urban</option>
+                <option value="rural">Rural</option>
+              </select>
+            </label>
+            <label className="text-sm">
+              Family members
+              <input
+                type="number" min="1" max="30" value={profile.family_members}
+                onChange={(e) => set("family_members", e.target.value)}
+                placeholder="e.g. 4"
+                aria-invalid={Boolean(errors.family_members)}
+                className={fieldClass("family_members")}
+              />
+              {errors.family_members && <p className="text-xs text-brick mt-1">{errors.family_members}</p>}
+            </label>
+          </div>
+
+          <label className="text-sm block">
+            Highest education level
+            <select
+              value={profile.education_level} onChange={(e) => set("education_level", e.target.value)}
+              className="mt-1 w-full border border-ink/30 rounded px-2 py-1.5 bg-transparent"
+            >
+              <option value="">Prefer not to say</option>
+              {EDUCATION_LEVELS.map((e2) => <option key={e2} value={e2}>{e2}</option>)}
+            </select>
           </label>
 
           <div>
@@ -313,6 +421,9 @@ export default function WelfareCopilot() {
             <TriToggle label="Girl child under 10 in family?" value={profile.has_girl_child_under_10} onChange={(v) => set("has_girl_child_under_10", v)} />
             <TriToggle label="BPL / SECC listed household?" value={profile.bpl_or_seci_listed} onChange={(v) => set("bpl_or_seci_listed", v)} />
             <TriToggle label="Certified disability (80%+)?" value={profile.has_disability} onChange={(v) => set("has_disability", v)} />
+            <TriToggle label="Currently studying?" value={profile.currently_studying} onChange={(v) => set("currently_studying", v)} />
+            <TriToggle label="Pregnant or lactating?" value={profile.is_pregnant_or_lactating} onChange={(v) => set("is_pregnant_or_lactating", v)} />
+            <TriToggle label="Have a bank account?" value={profile.has_bank_account} onChange={(v) => set("has_bank_account", v)} />
           </div>
 
           {Object.keys(errors).length > 0 && (

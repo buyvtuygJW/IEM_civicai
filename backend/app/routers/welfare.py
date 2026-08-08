@@ -1,9 +1,12 @@
+from collections import Counter
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from .. import schemas, models
 from ..database import get_db
 from ..services import eligibility_engine, ai_client, place_resolver
+from ..services.auth import require_role
 
 router = APIRouter(prefix="/api/welfare", tags=["welfare"])
 
@@ -43,6 +46,35 @@ def check_eligibility(profile: schemas.CitizenProfile, db: Session = Depends(get
     db.commit()
 
     return result
+
+
+@router.get("/admin/overview")
+def welfare_admin_overview(
+    db: Session = Depends(get_db),
+    _gov: models.User = Depends(require_role("government")),
+):
+    """Government-only welfare analytics — kept separate from the complaint
+    dashboard so each console page has a single, focused job."""
+    checks = db.query(models.EligibilityCheck).all()
+    scheme_counter = Counter(c.scheme_name for c in checks if c.matched)
+    state_counter = Counter(c.state for c in checks if c.state)
+    schemes_with_stats = [
+        {
+            "id": s["id"], "name": s["name"], "category": s["category"],
+            "benefit": s["benefit"],
+            "interested_citizens": scheme_counter.get(s["name"], 0),
+        }
+        for s in eligibility_engine.all_schemes()
+    ]
+    schemes_with_stats.sort(key=lambda s: -s["interested_citizens"])
+    return {
+        "total_eligibility_checks": len(checks),
+        "scheme_adoption": [{"scheme": name, "interested_citizens": count}
+                             for name, count in scheme_counter.most_common(8)],
+        "state_breakdown": [{"state": state, "count": count}
+                             for state, count in state_counter.most_common(8)],
+        "schemes": schemes_with_stats,
+    }
 
 
 @router.post("/chat")

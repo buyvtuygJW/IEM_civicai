@@ -21,6 +21,10 @@ export const fetchMe = () => api.get("/auth/me");
 export const checkEligibility = (profile) => api.post("/welfare/eligibility", profile);
 export const welfareChat = (message, profile) => api.post("/welfare/chat", { message, profile });
 export const listSchemes = () => api.get("/welfare/schemes");
+export const listStates = () => api.get("/welfare/states");
+
+// ---- Welfare admin (government only) ----
+export const welfareAdminOverview = () => api.get("/welfare/admin/overview");
 
 // ---- CivicWatch ----
 export const createComplaint = (payload) => api.post("/complaints", payload);

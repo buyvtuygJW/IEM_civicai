@@ -14,6 +14,10 @@ Each scheme in schemes.json declares a `criteria` dict. Supported criteria keys:
   state_in                     -> profile.state must be one of the listed states
                                   (matched via the India gazetteer, so "orissa"
                                   and "Odisha" are treated as the same state)
+  category_in                  -> profile.category must be in list (General/OBC/SC/ST)
+  currently_studying (bool)
+  is_pregnant_or_lactating (bool)
+  has_bank_account (bool)
 
 A scheme is "eligible" if ALL criteria are satisfied.
 A scheme is "almost_eligible" if at most one criterion fails (useful nudge, e.g.
@@ -30,6 +34,11 @@ SCHEMES_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "seed_data", 
 with open(SCHEMES_PATH, "r", encoding="utf-8") as f:
     SCHEMES = json.load(f)
 
+_BOOL_KEYS = (
+    "owns_land", "owns_pucca_house", "has_girl_child_under_10", "bpl_or_seci_listed",
+    "has_disability", "currently_studying", "is_pregnant_or_lactating", "has_bank_account",
+)
+
 
 def _human_label(key: str, value) -> str:
     if key == "min_age":
@@ -40,6 +49,8 @@ def _human_label(key: str, value) -> str:
         return f"Gender: {', '.join(value)}"
     if key == "occupation_in":
         return f"Occupation: {', '.join(value)}"
+    if key == "category_in":
+        return f"Category: {', '.join(value)}"
     if key == "max_income":
         return f"Annual income up to ₹{int(value):,}"
     if key == "owns_land":
@@ -54,6 +65,12 @@ def _human_label(key: str, value) -> str:
         return "Has a certified disability (80%+)"
     if key == "state_in":
         return f"State: {', '.join(value)}"
+    if key == "currently_studying":
+        return "Currently enrolled as a student"
+    if key == "is_pregnant_or_lactating":
+        return "Pregnant or lactating"
+    if key == "has_bank_account":
+        return "Has a bank account"
     return key
 
 
@@ -78,12 +95,15 @@ def _check_criterion(key: str, expected, profile: Dict) -> Tuple[bool, bool]:
             return False, False
         occ = profile["occupation"].lower()
         return any(o.lower() in occ or occ in o.lower() for o in expected), True
+    if key == "category_in":
+        if not profile.get("category"):
+            return False, False
+        return profile["category"].lower() in [c.lower() for c in expected], True
     if key == "max_income":
         if profile.get("annual_income") is None:
             return False, False
         return profile["annual_income"] <= expected, True
-    if key in ("owns_land", "owns_pucca_house", "has_girl_child_under_10",
-               "bpl_or_seci_listed", "has_disability"):
+    if key in _BOOL_KEYS:
         if profile.get(key) is None:
             return False, False
         return bool(profile[key]) == bool(expected), True
